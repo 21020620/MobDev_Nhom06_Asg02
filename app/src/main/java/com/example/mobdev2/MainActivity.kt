@@ -17,6 +17,7 @@ import com.example.mobdev2.ui.screens.auth.ChooseBookGenresView
 import com.example.mobdev2.ui.screens.auth.LoginView
 import com.example.mobdev2.ui.screens.auth.PasswordResetView
 import com.example.mobdev2.ui.screens.auth.SignUpView
+import com.example.mobdev2.ui.screens.book.BookDetailView
 import com.example.mobdev2.ui.theme.MobDev2Theme
 
 class MainActivity : ComponentActivity() {
@@ -44,6 +45,7 @@ fun CoreApp() {
         composable("sign_up", content = { SignUpView(navController = navController)})
         composable("password_reset", content = { PasswordResetView(navController = navController) })
         composable("choose_book_genres", content = { ChooseBookGenresView(navController = navController) })
+        composable("book_detail", content = { BookDetailView(navController = navController) })
     })
 }
 

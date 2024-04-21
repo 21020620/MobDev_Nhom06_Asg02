@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MobDev2</string>
+    <string name="book_synopsis">John McCarthy (4 tháng 9 năm 1927 - 24 tháng 10 năm 2011) là một nhà khoa học máy tính và nhà khoa học nhận thức người Mỹ. McCarthy là một trong những người sáng lập ra bộ môn trí tuệ nhân tạo.[1] Ông đặt ra thuật ngữ \" trí tuệ nhân tạo \" (AI), phát triển họ ngôn ngữ lập trình Lisp, ngôn ngữ này ảnh hưởng đáng kể đến việc thiết kế ngôn ngữ lập trình ALGOL, chia sẻ thời gian và có ảnh hưởng rất lớn trong sự phát triển ban đầu của AI.\n\nMcCarthy dành phần lớn sự nghiệp của mình tại Đại học Stanford.[2] Ông đã nhận được nhiều giải thưởng và danh dự, như Giải thưởng Turing cho những đóng góp của ông cho chủ đề AI năm 1971,[3] Huân chương Khoa học Quốc gia Hoa Kỳ năm 1990 và Giải thưởng Kyoto năm 1988, cùng huân chương Benjamin Franklin năm 2003[4].</string>
+    <string name="back_button_desc">Go back</string>
 </resources>
