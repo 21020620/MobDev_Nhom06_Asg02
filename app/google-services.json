@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "186501447353",
+    "project_id": "mobdev2-7c483",
+    "storage_bucket": "mobdev2-7c483.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:186501447353:android:5899a73d83d185858ea568",
+        "android_client_info": {
+          "package_name": "com.example.mobdev2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVJ58DuQ9hDIm7JBVgC7bgN3g2BQTG4ao"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

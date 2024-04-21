@@ -10,6 +10,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.mobdev2.ui.screens.auth.LoginView
+import com.example.mobdev2.ui.screens.auth.PasswordResetView
+import com.example.mobdev2.ui.screens.auth.SignUpView
 import com.example.mobdev2.ui.theme.MobDev2Theme
 
 class MainActivity : ComponentActivity() {
@@ -22,11 +28,21 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    Greeting("Android")
+                    CoreApp()
                 }
             }
         }
     }
+}
+
+@Composable
+fun CoreApp() {
+    val navController = rememberNavController()
+    NavHost(navController = navController, startDestination = "login", builder = {
+        composable("login", content = { LoginView(navController = navController)})
+        composable("sign_up", content = { SignUpView(navController = navController)})
+        composable("password_reset", content = { PasswordResetView(navController = navController) })
+    })
 }
 
 @Composable
