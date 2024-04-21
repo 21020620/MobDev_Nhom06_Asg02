@@ -28,6 +28,7 @@ import com.example.mobdev2.ui.components.auth.EmailField
 import com.example.mobdev2.ui.components.auth.PasswordField
 import com.example.mobdev2.ui.components.auth.SignUpButtonGroup
 import com.example.mobdev2.ui.components.auth.Title
+import com.example.mobdev2.ui.navigation.Screens
 import com.example.mobdev2.ui.theme.MobDev2Theme
 
 
@@ -107,7 +108,7 @@ fun SignUpView(navController: NavController? = null) {
 
                 Surface(modifier = Modifier.weight(1f)) {
                     SignUpButtonGroup(
-                        signUp = { },
+                        signUp = { navController?.navigate(Screens.ChooseBookGenres.route)},
                         login = { navController?.popBackStack() }
                     )
                 }
