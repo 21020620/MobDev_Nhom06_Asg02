@@ -109,7 +109,7 @@ fun LoginView(navController: NavController? = null) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 LoginButtonGroup(
-                    loginWithPassword = { },
+                    loginWithPassword = { navController?.navigate(Screens.BookDetail.route)},
                     loginWithGoogle = { },
                     signUp = { navController?.navigate(Screens.Signup.route)}
                 )
