@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.mobdev2.ui.screens.auth.ChooseBookGenresView
 import com.example.mobdev2.ui.screens.auth.LoginView
 import com.example.mobdev2.ui.screens.auth.PasswordResetView
 import com.example.mobdev2.ui.screens.auth.SignUpView
@@ -42,6 +43,7 @@ fun CoreApp() {
         composable("login", content = { LoginView(navController = navController)})
         composable("sign_up", content = { SignUpView(navController = navController)})
         composable("password_reset", content = { PasswordResetView(navController = navController) })
+        composable("choose_book_genres", content = { ChooseBookGenresView(navController = navController) })
     })
 }
 
