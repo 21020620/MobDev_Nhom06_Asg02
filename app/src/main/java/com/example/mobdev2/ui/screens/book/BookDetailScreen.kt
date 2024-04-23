@@ -1,13 +1,11 @@
 package com.example.mobdev2.ui.screens.book
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,42 +16,37 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mobdev2.R
 import com.example.mobdev2.ui.components.CustomButton
 import com.example.mobdev2.ui.components.book.BookDetailTopUI
-import com.example.mobdev2.ui.theme.MobDev2Theme
+import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.theme.figeronaFont
 import com.example.mobdev2.ui.theme.pacificoFont
+import com.ramcosta.composedestinations.annotation.Destination
 
-
+@BookNavGraph
 @Composable
-fun BookDetailView(
+@Destination
+fun BookDetailScreen(
 //    bookId: String,
     navController: NavController? = null
 ) {
@@ -71,8 +64,6 @@ fun BookDetailView(
                     .padding(paddingValues)
                     .background(MaterialTheme.colorScheme.background)
             ) {
-
-
                 Column(
                     Modifier
                         .fillMaxSize()
@@ -87,8 +78,6 @@ fun BookDetailView(
                         imageData = R.drawable.placeholder_cat,
                     )
 
-
-
                     Text(
                         text = "Synopsis",
                         fontSize = 20.sp,
@@ -96,10 +85,7 @@ fun BookDetailView(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onBackground,
                         modifier = Modifier.padding(start = 12.dp, end = 8.dp),
-
                         )
-
-
 
                     Text(
                         text = stringResource(id = R.string.book_synopsis),
@@ -108,11 +94,7 @@ fun BookDetailView(
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onBackground,
                     )
-
-
                 }
-
-
             }
         })
 }
@@ -150,7 +132,6 @@ fun BookDetailTopBar(
             fontFamily = pacificoFont,
             fontStyle = MaterialTheme.typography.headlineMedium.fontStyle
         )
-
 
         Spacer(modifier = Modifier.weight(1f))
 
@@ -221,14 +202,6 @@ fun BookDetailBottomBar(
                 modifier = Modifier.padding(5.dp)
             )
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun Preview() {
-    MobDev2Theme {
-        BookDetailView()
     }
 }
 

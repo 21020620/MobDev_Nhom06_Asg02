@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -22,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mobdev2.R
 import com.example.mobdev2.ui.components.CustomButton
+import com.example.mobdev2.ui.components.ExpandableTextField
 import com.example.mobdev2.ui.theme.Purple40
-import com.google.android.gms.common.SignInButton
 
 @Composable
 fun LoginButtonGroup(
@@ -104,7 +105,84 @@ fun LoginButtonGroup(
             highlightColor = Purple40,
             onClick = signUp
         )
-
     }
+}
 
+@Composable
+fun SignUpButtonGroup(
+    signUp: () -> Unit = {},
+    login: () -> Unit = {}
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        CustomButton(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(45.dp),
+            onClick = signUp,
+            text = "Sign Up",
+            fontSize = 15.sp,
+            shape = RoundedCornerShape(24)
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        PromptRow(
+            normalText = "Already have an account?",
+            highlightedText = "Login",
+            highlightColor = Purple40,
+            onClick = login
+        )
+    }
+}
+
+@Composable
+fun EmailField(
+    onValueChange: ((String) -> Unit)? = null,
+    errorText: String,
+    isError: Boolean = false,
+    input: String = ""
+) {
+    ExpandableTextField(
+        modifier = Modifier.fillMaxWidth(),
+        onValueChange = onValueChange,
+        label = "Email",
+        placeholder = "Enter Your Email",
+        leadingIcon = {
+            Icon(
+                painter = painterResource(id = R.drawable.email),
+                contentDescription = null)
+        },
+        value = input,
+        isError = isError,
+        errorText = errorText,
+    )
+}
+
+@Composable
+fun PasswordField(
+    isNormal: Boolean = true,
+    onValueChange: ((String) -> Unit)? = null,
+    errorText: String,
+    isError: Boolean = false,
+    input: String = ""
+) {
+    ExpandableTextField(
+        isPassword = true,
+        onValueChange = onValueChange,
+        label = "Password",
+        placeholder = "${if (isNormal) "Enter" else "Confirm"} Your Password",
+        modifier = Modifier.fillMaxWidth(),
+        leadingIcon = {
+            Icon(
+                painter = painterResource(id = if (isNormal) R.drawable.key else R.drawable.lock),
+                contentDescription = null,
+            )
+        },
+        isError = isError,
+        errorText = errorText,
+        value = input,
+    )
 }

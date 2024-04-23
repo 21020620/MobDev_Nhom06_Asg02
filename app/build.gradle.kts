@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    alias(libs.plugins.androidKsp)
+    alias(libs.plugins.googleServices)
 }
 
 android {
@@ -40,12 +42,17 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.10"
     }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+    applicationVariants.all {
+        addJavaSourceFoldersToModel(
+            File(layout.buildDirectory.get().asFile, "generated/ksp/$name/kotlin")
+        )
     }
 }
 
@@ -58,17 +65,25 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-//    implementation(libs.androidx.material3)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.material.icons.core)
+    implementation(libs.androidx.material.icons.extended)
 
-    implementation(libs.androidx.navigation.runtime.ktx)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.material3.android)
 
-    implementation ("io.coil-kt:coil-compose:2.4.0")
+    implementation (libs.coil.compose)
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)    
     implementation(libs.firebase.firestore)
+
+    implementation(libs.compose.destination)
+    ksp(libs.compose.destination.ksp)
+
+    implementation(platform(libs.koin.annotations.bom))
+    implementation(libs.koin.android)
+    implementation(libs.koin.annotations)
+    implementation(libs.koin.androidx.compose)
+    ksp(libs.koin.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
