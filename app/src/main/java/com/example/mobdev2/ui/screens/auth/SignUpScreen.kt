@@ -10,39 +10,41 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.mobdev2.R
 import com.example.mobdev2.ui.components.auth.EmailField
 import com.example.mobdev2.ui.components.auth.PasswordField
 import com.example.mobdev2.ui.components.auth.SignUpButtonGroup
 import com.example.mobdev2.ui.components.auth.Title
-import com.example.mobdev2.ui.navigation.Screens
-import com.example.mobdev2.ui.theme.MobDev2Theme
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 
+@RootNavGraph
+@Destination
 @Composable
-fun SignUpView(navController: NavController? = null) {
+fun SignUpScreen(
+    navigator: DestinationsNavigator,
+    viewModel: SignUpViewModel = koinViewModel(parameters = {
+        parametersOf(navigator)
+    })
+) {
 
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var confirmPassword by remember { mutableStateOf("") }
-
-    var emailError by remember { mutableStateOf("") }
-    var passwordError by remember { mutableStateOf("") }
-    var confirmPasswordError by remember { mutableStateOf("") }
-
+    val email = viewModel.email.collectAsState()
+    val password = viewModel.password.collectAsState()
+    val confirmPassword = viewModel.confirmPassword.collectAsState()
+    val emailError = viewModel.emailError.collectAsState()
+    val passwordError = viewModel.passwordError.collectAsState()
+    val confirmPasswordError = viewModel.confirmPasswordError.collectAsState()
 
     Surface {
         Column (
@@ -79,20 +81,25 @@ fun SignUpView(navController: NavController? = null) {
                 verticalArrangement = Arrangement.spacedBy(15.dp)
             ) {
                 EmailField(
-                    onValueChange = { email = it },
-                    errorText = emailError,
-                    isError = emailError.isNotEmpty()
+                    input = email.value,
+                    onValueChange = viewModel::setEmail,
+                    errorText = emailError.value,
+                    isError = emailError.value.isNotEmpty()
                 )
 
                 PasswordField(
-                    onValueChange = { password = it },
-                    errorText = passwordError)
+                    input = password.value,
+                    onValueChange = viewModel::setPassword,
+                    isError = passwordError.value.isNotEmpty(),
+                    errorText = passwordError.value
+                )
 
                 PasswordField(
+                    input = confirmPassword.value,
                     isNormal = false,
-                    onValueChange = { confirmPassword = it },
-                    errorText = confirmPasswordError,
-                    isError = confirmPasswordError.isNotEmpty()
+                    onValueChange = viewModel::setConfirmPassword,
+                    errorText = confirmPasswordError.value,
+                    isError = confirmPasswordError.value.isNotEmpty()
                 )
             }
 
@@ -108,17 +115,11 @@ fun SignUpView(navController: NavController? = null) {
 
                 Surface(modifier = Modifier.weight(1f)) {
                     SignUpButtonGroup(
-                        signUp = { navController?.navigate(Screens.ChooseBookGenres.route)},
-                        login = { navController?.popBackStack() }
+                        signUp = viewModel::signUp,
+                        login = viewModel::login
                     )
                 }
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun SignUpPreview() {
-    MobDev2Theme { SignUpView() }
 }

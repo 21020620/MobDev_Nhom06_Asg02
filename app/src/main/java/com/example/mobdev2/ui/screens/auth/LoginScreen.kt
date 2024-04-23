@@ -12,32 +12,36 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.example.mobdev2.R
 import com.example.mobdev2.ui.components.auth.EmailField
 import com.example.mobdev2.ui.components.auth.LoginButtonGroup
 import com.example.mobdev2.ui.components.auth.PasswordField
 import com.example.mobdev2.ui.components.auth.PromptRow
 import com.example.mobdev2.ui.components.auth.Title
-import com.example.mobdev2.ui.navigation.Screens
-import com.example.mobdev2.ui.theme.MobDev2Theme
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
+@RootNavGraph(start = true)
+@Destination
 @Composable
-fun LoginView(navController: NavController? = null) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-
-    var emailError by remember { mutableStateOf("") }
-    var passwordError by remember { mutableStateOf("") }
+fun LoginScreen(
+    navigator: DestinationsNavigator,
+    viewModel: LoginViewModel = koinViewModel(parameters = {
+        parametersOf(navigator)
+    })
+) {
+    val email = viewModel.email.collectAsState()
+    val password = viewModel.password.collectAsState()
+    val emailError = viewModel.emailError.collectAsState()
+    val passwordError = viewModel.passwordError.collectAsState()
 
     Surface {
         Column(
@@ -75,15 +79,17 @@ fun LoginView(navController: NavController? = null) {
                 verticalArrangement = Arrangement.spacedBy(15.dp)
             ) {
                 EmailField(
-                    onValueChange = { email = it },
-                    errorText = emailError,
-                    isError = emailError.isNotEmpty()
+                    onValueChange = viewModel::setEmail,
+                    errorText = emailError.value,
+                    isError = emailError.value.isNotEmpty(),
+                    input = email.value
                 )
 
                 PasswordField(
-                    onValueChange = { password = it },
-                    errorText = passwordError,
-                    isError = passwordError.isNotEmpty()
+                    onValueChange = viewModel::setPassword,
+                    errorText = passwordError.value,
+                    isError = passwordError.value.isNotEmpty(),
+                    input = password.value
                 )
 
                 Box(
@@ -95,7 +101,7 @@ fun LoginView(navController: NavController? = null) {
                         normalText = "Forgot Password?",
                         highlightedText = "Reset",
                         highlightColor = MaterialTheme.colorScheme.error,
-                       onClick = { navController?.navigate(Screens.PasswordReset.route)}
+                        onClick = { }
                     )
                 }
             }
@@ -109,17 +115,11 @@ fun LoginView(navController: NavController? = null) {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 LoginButtonGroup(
-                    loginWithPassword = { navController?.navigate(Screens.BookDetail.route)},
-                    loginWithGoogle = { },
-                    signUp = { navController?.navigate(Screens.Signup.route)}
+                    loginWithPassword = viewModel::loginWithEmailPassword,
+                    loginWithGoogle = viewModel::loginWithGoogle,
+                    signUp = viewModel::signUp
                 )
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun LoginPreview() {
-    MobDev2Theme { LoginView() }
 }
