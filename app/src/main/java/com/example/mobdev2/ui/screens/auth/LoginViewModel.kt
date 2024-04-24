@@ -42,6 +42,7 @@ class LoginViewModel(
     }
 
     fun loginWithGoogle() = viewModelScope.launch {
+
         navigator.navigate(PickBookGenresScreenDestination)
     }
 
