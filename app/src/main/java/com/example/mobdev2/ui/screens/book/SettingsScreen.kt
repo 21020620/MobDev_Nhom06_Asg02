@@ -2,6 +2,7 @@ package com.example.mobdev2.ui.screens.book
 
 import android.content.Context
 import android.media.AudioManager
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -24,6 +25,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.NightsStay
@@ -66,6 +68,9 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mobdev2.R
 import com.example.mobdev2.ui.theme.figeronaFont
+import com.google.firebase.Firebase
+import com.google.firebase.auth.auth
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import androidx.compose.ui.text.style.TextOverflow.Companion as TextOverflow1
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -73,7 +78,9 @@ import androidx.compose.ui.text.style.TextOverflow.Companion as TextOverflow1
 @Composable
 @Destination
 fun SettingsScreen(
-    navController: NavController? = null
+    navController: NavController? = null,
+    navigator: DestinationsNavigator,
+//    shareModel: ShareModel = ShareModel()
 ) {
 
 
@@ -148,6 +155,8 @@ fun SettingsScreen(
                     modifier = Modifier.padding(top = 20.dp, start = 20.dp)
                 )
                 NotificationSetting()
+                HorizontalDivider()
+                Logout(navigator)
             }
         }
     }
@@ -357,6 +366,47 @@ fun NotificationSetting() {
                 }
             }
 
+        }
+    }
+}
+@Composable
+fun Logout(
+    navigator: DestinationsNavigator,
+
+) {
+    Card(
+        modifier = Modifier
+            .padding(20.dp)
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .clickable {
+                Log.d("AUTHENTICATION", "Logout")
+                Firebase.auth.signOut()
+                navigator.popBackStack("book_graph", inclusive = true)
+//                navigator.navigate("root/login_screen")
+            },
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
+        ),
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.ArrowBackIosNew,
+                contentDescription = "logout",
+                modifier = Modifier.padding(end = 10.dp)
+            )
+            Column {
+                Text(
+                    text = "Logout",
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight(700))
+                )
+
+            }
         }
     }
 }
