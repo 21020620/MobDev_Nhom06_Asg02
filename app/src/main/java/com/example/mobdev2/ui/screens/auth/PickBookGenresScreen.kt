@@ -34,7 +34,7 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
 
-@RootNavGraph
+@RootNavGraph(start = true)
 @Destination
 @Composable
 fun PickBookGenresScreen(
