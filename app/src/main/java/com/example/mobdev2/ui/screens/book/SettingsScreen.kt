@@ -1,16 +1,23 @@
 package com.example.mobdev2.ui.screens.book
 
+import android.app.Notification
 import android.content.Context
 import android.media.AudioManager
 import androidx.compose.foundation.Image
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.lifecycle.ViewModel
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
+
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -24,6 +31,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.NightsStay
@@ -59,11 +68,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mobdev2.R
+import com.example.mobdev2.ui.screens.book.main.BottomBar
+import com.example.mobdev2.ui.theme.MobDev2Theme
 import com.example.mobdev2.ui.theme.figeronaFont
 import androidx.compose.ui.text.style.TextOverflow.Companion as TextOverflow1
 
@@ -72,50 +84,53 @@ import androidx.compose.ui.text.style.TextOverflow.Companion as TextOverflow1
 @Composable
 @Destination
 fun SettingsScreen(
-    navController: NavController? = null
+    navController: NavController ? = null
 ) {
 
 
     val snackBarHostState = remember { SnackbarHostState() }
 
     Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
-                    titleContentColor = MaterialTheme.colorScheme.onBackground,
-                ),
-                title = {
-                    Text(
-                        stringResource(id = R.string.book_settings_screen),
-                        maxLines = 1,
-                        overflow = TextOverflow1.Ellipsis,
-                        modifier = Modifier.padding(bottom = 2.dp),
-                        fontSize = 22.sp,
-                        fontFamily = figeronaFont,
-                        fontStyle = MaterialTheme.typography.headlineMedium.fontStyle
+        topBar = { CenterAlignedTopAppBar(
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
+                titleContentColor = MaterialTheme.colorScheme.onBackground,
+            ),
+            title = {
+                Text(
+                    stringResource(id = R.string.book_settings_screen),
+                    maxLines = 1,
+                    overflow = TextOverflow1.Ellipsis,
+                    modifier = Modifier.padding(bottom = 2.dp),
+                    fontSize = 22.sp,
+                    fontFamily = figeronaFont,
+                    fontStyle = MaterialTheme.typography.headlineMedium.fontStyle
+                )
+            },
+            navigationIcon = {
+                IconButton(onClick = { /* do something */ }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                        contentDescription = "Go back"
                     )
-                },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        navController?.navigateUp()
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = "Go back"
-                        )
-                    }
-                },
-                actions = {
+                }
+            },
+            actions = {
+                IconButton(onClick = { /* do something */ }) {
                     Icon(
                         imageVector = Icons.Outlined.Settings,
-                        contentDescription = "Setting",
-                        modifier = Modifier.padding(end = 10.dp)
+                        contentDescription = "Setting"
                     )
-                },
+                }
+            },
 
-                )
-        },
+        ) },
+//        bottomBar = {
+//            navController?.let {
+//            BottomBar(it)
+//            }
+//        },
+        modifier = Modifier.padding(bottom = 70.dp),
         snackbarHost = { SnackbarHost(snackBarHostState) },
     ) { paddingValues ->
         Column(
@@ -124,6 +139,7 @@ fun SettingsScreen(
                 .background(MaterialTheme.colorScheme.background)
                 .padding(paddingValues)
         ) {
+
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 ProfileCard()
                 Divider()
@@ -179,10 +195,7 @@ fun ProfileCard() {
                     .clip(CircleShape)
             )
             Column(modifier = Modifier.padding(start = 16.dp)) {
-                Text(
-                    text = "Donald Trump",
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight(700))
-                )
+                Text(text = "Donald Trump", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight(700)))
                 Text(text = "donaldtrump@example.com", style = MaterialTheme.typography.bodyLarge)
             }
             Spacer(modifier = Modifier.weight(1f))
@@ -190,17 +203,19 @@ fun ProfileCard() {
                 Icon(
                     imageVector = Icons.Outlined.Edit,
                     contentDescription = "Edit Profile",
-                    modifier = Modifier.padding(end = 5.dp)
+//                    modifier = Modifier.padding(end = 5.dp)
                 )
             }
         }
     }
 }
-
 @Composable
 @Preview
 fun ThemeSetting() {
-    var currentTheme by remember { mutableStateOf(0) }
+    val context = LocalContext.current
+    val currentTheme = context.resources.configuration.uiMode
+    val isDarkTheme = false
+    MobDev2Theme(darkTheme = isDarkTheme) {
         Card(
             modifier = Modifier
                 .padding(20.dp)
@@ -219,7 +234,7 @@ fun ThemeSetting() {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                if (currentTheme == 0) {
+                if (currentTheme != 0) {
                     Icon(
                         imageVector = Icons.Outlined.LightMode,
                         contentDescription = "Change Theme",
@@ -232,16 +247,17 @@ fun ThemeSetting() {
                         modifier = Modifier.padding(end = 10.dp)
                     )
                 }
+
                 Column {
-                    Text(
-                        text = "Change Theme",
-                        style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight(700))
-                    )
+                    Text(text = "Change Theme", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight(700)))
+
+
                 }
             }
         }
-}
 
+    }
+}
 @Composable
 @Preview
 fun SoundSetting() {
@@ -284,25 +300,17 @@ fun SoundSetting() {
                     modifier = Modifier.padding(end = 10.dp)
                 )
             }
-
+            
             Column {
-                Text(
-                    text = "Audio Volume",
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight(700))
-                )
+                Text(text = "Audio Volume", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight(700)))
                 Slider(value = sliderPosition, onValueChange = {
                     sliderPosition = it
-                    audioManager.setStreamVolume(
-                        AudioManager.STREAM_MUSIC,
-                        (it * maxVolume).toInt(),
-                        0
-                    )
+                    audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, (it * maxVolume).toInt(), 0)
                 })
             }
         }
     }
 }
-
 @Composable
 @Preview
 fun NotificationSetting() {
@@ -339,20 +347,11 @@ fun NotificationSetting() {
 
             }
             Column {
-                Text(
-                    text = "Notifications",
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight(700))
-                )
+                Text(text = "Notifications", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight(700)))
                 if (boolean) {
-                    Text(
-                        text = "Turn off notifications",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    Text(text = "Turn off notifications", style = MaterialTheme.typography.bodyMedium)
                 } else {
-                    Text(
-                        text = "Turn on notifications",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                    Text(text = "Turn on notifications", style = MaterialTheme.typography.bodyMedium)
                 }
             }
 
