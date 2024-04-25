@@ -31,8 +31,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.LightMode
 import androidx.compose.material.icons.outlined.NightsStay
@@ -45,8 +43,8 @@ import androidx.compose.material.icons.outlined.VolumeUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -68,13 +66,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mobdev2.R
-import com.example.mobdev2.ui.screens.book.main.BottomBar
 import com.example.mobdev2.ui.theme.MobDev2Theme
 import com.example.mobdev2.ui.theme.figeronaFont
 import androidx.compose.ui.text.style.TextOverflow.Companion as TextOverflow1
@@ -125,12 +121,6 @@ fun SettingsScreen(
             },
 
         ) },
-//        bottomBar = {
-//            navController?.let {
-//            BottomBar(it)
-//            }
-//        },
-        modifier = Modifier.padding(bottom = 70.dp),
         snackbarHost = { SnackbarHost(snackBarHostState) },
     ) { paddingValues ->
         Column(
@@ -142,21 +132,21 @@ fun SettingsScreen(
 
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 ProfileCard()
-                Divider()
+                HorizontalDivider()
                 Text(
                     text = "Display",
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight(700)),
                     modifier = Modifier.padding(top = 20.dp, start = 20.dp)
                 )
                 ThemeSetting()
-                Divider()
+                HorizontalDivider()
                 Text(
                     text = "Sound",
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight(700)),
                     modifier = Modifier.padding(top = 20.dp, start = 20.dp)
                 )
                 SoundSetting()
-                Divider()
+                HorizontalDivider()
                 Text(
                     text = "Notifications",
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight(700)),
@@ -317,7 +307,7 @@ fun NotificationSetting() {
     var boolean by remember { mutableStateOf(true) }
     Card(
         modifier = Modifier
-            .padding(20.dp)
+            .padding(20.dp, 20.dp, 20.dp)
             .fillMaxWidth()
             .wrapContentHeight()
             .clickable { /* handle notification here */ },

@@ -7,4 +7,6 @@
     <string name="book_settings_screen">Settings</string>
     <string name="book_forum_screen">Forum</string>
     <string name="cover_image_desc">Book cover image</string>
+    <string name="library_read_button">Read</string>
+    <string name="library_delete_button">Delete</string>
 </resources>
