@@ -49,4 +49,6 @@ class LoginViewModel(
     fun signUp() = viewModelScope.launch {
         navigator.navigate(SignUpScreenDestination)
     }
+
+    fun hasUser() = Firebase.auth.currentUser != null
 }

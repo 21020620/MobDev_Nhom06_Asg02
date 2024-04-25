@@ -38,6 +38,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -126,21 +127,21 @@ fun SettingsScreen(
         ) {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 ProfileCard()
-                Divider()
+                HorizontalDivider()
                 Text(
                     text = "Display",
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight(700)),
                     modifier = Modifier.padding(top = 20.dp, start = 20.dp)
                 )
                 ThemeSetting()
-                Divider()
+                HorizontalDivider()
                 Text(
                     text = "Sound",
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight(700)),
                     modifier = Modifier.padding(top = 20.dp, start = 20.dp)
                 )
                 SoundSetting()
-                Divider()
+                HorizontalDivider()
                 Text(
                     text = "Notifications",
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight(700)),
