@@ -17,6 +17,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -27,8 +29,12 @@ import com.example.mobdev2.ui.components.auth.LoginButtonGroup
 import com.example.mobdev2.ui.components.auth.PasswordField
 import com.example.mobdev2.ui.components.auth.PromptRow
 import com.example.mobdev2.ui.components.auth.Title
+import com.example.mobdev2.ui.screens.book.ShareModel
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.screens.destinations.BookHomeScreenDestination
+import com.example.mobdev2.ui.screens.destinations.LoginScreenDestination
+import com.example.mobdev2.ui.screens.destinations.ResetPasswordScreenDestination
+import com.example.mobdev2.ui.screens.destinations.SignUpScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -44,12 +50,13 @@ fun LoginScreen(
     viewModel: LoginViewModel = koinViewModel(parameters = {
         parametersOf(navigator)
     })
+//    shareModel: ShareModel
 ) {
-    navigator.clearBackStack("root")
     val email = viewModel.email.collectAsState()
     val password = viewModel.password.collectAsState()
     val emailError = viewModel.emailError.collectAsState()
     val passwordError = viewModel.passwordError.collectAsState()
+//    val navigateToLogin by shareModel.navigateToLogin.observeAsState(initial = false)
     LaunchedEffect(Unit) {
         if(viewModel.hasUser()) navigator.navigate(BookHomeScreenDestination)
     }
@@ -125,7 +132,9 @@ fun LoginScreen(
                         normalText = "Forgot Password?",
                         highlightedText = "Reset",
                         highlightColor = MaterialTheme.colorScheme.error,
-                        onClick = { }
+                        onClick = {
+                            navigator.navigate(ResetPasswordScreenDestination)
+                        }
                     )
                 }
             }
