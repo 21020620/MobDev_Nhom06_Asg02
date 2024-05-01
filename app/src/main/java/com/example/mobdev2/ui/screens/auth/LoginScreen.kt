@@ -1,5 +1,8 @@
 package com.example.mobdev2.ui.screens.auth
 
+import android.app.Activity
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -50,6 +53,20 @@ fun LoginScreen(
     LaunchedEffect(Unit) {
         if(viewModel.hasUser()) navigator.navigate(BookHomeScreenDestination)
     }
+//    Observe the navigateToLogin state
+//    if (navigateToLogin) {
+//        // Navigate to LoginScreen
+//        navigator.navigate(LoginScreenDestination)
+//        // Reset the state
+//        shareModel.navigateToLogin.value = false
+//    }
+
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartIntentSenderForResult()
+    ) {
+        if (it.resultCode == Activity.RESULT_OK) viewModel.signIn(it.data)
+    }
+
     Surface {
         Column(
             modifier = Modifier
@@ -123,7 +140,7 @@ fun LoginScreen(
             ) {
                 LoginButtonGroup(
                     loginWithPassword = viewModel::loginWithEmailPassword,
-                    loginWithGoogle = viewModel::loginWithGoogle,
+                    loginWithGoogle = {viewModel.loginWithGoogle(launcher)},
                     signUp = viewModel::signUp
                 )
             }

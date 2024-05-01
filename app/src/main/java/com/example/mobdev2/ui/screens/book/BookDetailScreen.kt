@@ -180,7 +180,7 @@ fun BookDetailBottomBar(
 
         CustomButton(
             surfaceModifier = Modifier
-                .width(150.dp)
+                .width(180.dp)
                 .height(45.dp),
             onClick = {},
             text = "Start Reading",
