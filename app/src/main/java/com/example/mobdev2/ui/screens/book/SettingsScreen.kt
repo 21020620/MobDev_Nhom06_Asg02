@@ -2,13 +2,11 @@ package com.example.mobdev2.ui.screens.book
 
 import android.content.Context
 import android.media.AudioManager
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.ramcosta.composedestinations.annotation.Destination
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -38,7 +36,7 @@ import androidx.compose.material.icons.outlined.VolumeUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Divider
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -50,6 +48,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -71,6 +70,7 @@ import com.example.mobdev2.ui.theme.figeronaFont
 import com.google.firebase.Firebase
 import com.google.firebase.auth.auth
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import org.koin.androidx.compose.koinViewModel
 import androidx.compose.ui.text.style.TextOverflow.Companion as TextOverflow1
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -80,11 +80,16 @@ import androidx.compose.ui.text.style.TextOverflow.Companion as TextOverflow1
 fun SettingsScreen(
     navController: NavController? = null,
     navigator: DestinationsNavigator,
-//    shareModel: ShareModel = ShareModel()
+    viewModel: SettingsScreenViewModel = koinViewModel()
 ) {
 
-
     val snackBarHostState = remember { SnackbarHostState() }
+    val isSigningOut = viewModel.isSigningOut.collectAsState()
+
+    if(isSigningOut.value) {
+        CircularProgressIndicator()
+        navigator.clearBackStack("book_graph")
+    }
 
     Scaffold(
         topBar = {
@@ -156,7 +161,7 @@ fun SettingsScreen(
                 )
                 NotificationSetting()
                 HorizontalDivider()
-                Logout(navigator)
+                Logout(viewModel)
             }
         }
     }
@@ -371,8 +376,7 @@ fun NotificationSetting() {
 }
 @Composable
 fun Logout(
-    navigator: DestinationsNavigator,
-
+    viewModel: SettingsScreenViewModel
 ) {
     Card(
         modifier = Modifier
@@ -380,10 +384,8 @@ fun Logout(
             .fillMaxWidth()
             .wrapContentHeight()
             .clickable {
-                Log.d("AUTHENTICATION", "Logout")
+                viewModel.setIsLoading()
                 Firebase.auth.signOut()
-                navigator.popBackStack("book_graph", inclusive = true)
-//                navigator.navigate("root/login_screen")
             },
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
