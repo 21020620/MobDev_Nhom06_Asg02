@@ -1,6 +1,5 @@
 package com.example.mobdev2.ui.screens.book.main
 
-import android.util.Log
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -10,7 +9,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.navigation.compose.ComposeNavigator
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.mobdev2.ui.screens.NavGraphs
@@ -49,6 +47,7 @@ fun BookHomeScreen(
 
     LaunchedEffect(authState.value) {
         if (authState.value == null) {
+            println("Here")
             viewModel.navigateToLogin()
         }
     }
