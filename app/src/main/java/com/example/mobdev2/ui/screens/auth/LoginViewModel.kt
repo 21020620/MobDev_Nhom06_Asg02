@@ -13,7 +13,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mobdev2.R
 import com.example.mobdev2.ui.screens.destinations.BookHomeScreenDestination
-import com.example.mobdev2.ui.screens.destinations.PickBookGenresScreenDestination
 import com.example.mobdev2.ui.screens.destinations.SignUpScreenDestination
 import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -115,6 +114,5 @@ class LoginViewModel(
             null
         }?.pendingIntent?.intentSender
     }
-
 
 }

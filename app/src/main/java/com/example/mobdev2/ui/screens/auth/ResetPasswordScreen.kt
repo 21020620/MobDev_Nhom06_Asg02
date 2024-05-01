@@ -37,17 +37,23 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mobdev2.R
 import com.example.mobdev2.ui.components.auth.innerShadow
+import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.theme.Purple20
 import com.example.mobdev2.ui.theme.Purple40
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @RootNavGraph
 @Destination
 @Composable
 fun ResetPasswordScreen(
-    viewModel: ResetPasswordViewModel = koinViewModel()
+    navigator: DestinationsNavigator,
+    viewModel: ResetPasswordViewModel = koinViewModel(parameters = {
+        parametersOf(navigator)
+    }),
 ) {
     val email = viewModel.email.collectAsState()
 
@@ -147,7 +153,7 @@ fun ResetPasswordScreen(
                         .height(48.dp),
                     shape = RoundedCornerShape(40),
                     colors = ButtonDefaults.buttonColors(containerColor = Purple40),
-                    onClick = { }
+                    onClick = { viewModel.resetPassword(email.value) }
                 ) {
                     Text(
                         text = "Submit",

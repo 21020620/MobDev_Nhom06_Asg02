@@ -33,6 +33,8 @@ import com.example.mobdev2.ui.screens.book.ShareModel
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.screens.destinations.BookHomeScreenDestination
 import com.example.mobdev2.ui.screens.destinations.LoginScreenDestination
+import com.example.mobdev2.ui.screens.destinations.ResetPasswordScreenDestination
+import com.example.mobdev2.ui.screens.destinations.SignUpScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -130,7 +132,9 @@ fun LoginScreen(
                         normalText = "Forgot Password?",
                         highlightedText = "Reset",
                         highlightColor = MaterialTheme.colorScheme.error,
-                        onClick = { }
+                        onClick = {
+                            navigator.navigate(ResetPasswordScreenDestination)
+                        }
                     )
                 }
             }
