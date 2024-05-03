@@ -3,10 +3,6 @@ package com.example.mobdev2.ui.screens.book
 import android.content.Context
 import android.media.AudioManager
 import androidx.compose.foundation.Image
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import com.example.mobdev2.ui.screens.book.main.BookNavGraph
-import com.ramcosta.composedestinations.annotation.Destination
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -46,8 +42,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -66,12 +64,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mobdev2.R
+import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.theme.figeronaFont
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
 import androidx.compose.ui.text.style.TextOverflow.Companion as TextOverflow1
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @BookNavGraph
@@ -171,6 +173,7 @@ fun SettingsScreen(
 @Composable
 @Preview
 fun ProfileCard() {
+    val user = FirebaseAuth.getInstance().currentUser
     Card(
         modifier = Modifier
             .padding(20.dp)
@@ -195,10 +198,10 @@ fun ProfileCard() {
             )
             Column(modifier = Modifier.padding(start = 16.dp)) {
                 Text(
-                    text = "Donald Trump",
+                    text = user?.displayName ?: "Reader",
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight(700))
                 )
-                Text(text = "donaldtrump@example.com", style = MaterialTheme.typography.bodyLarge)
+                Text(text = user?.email ?: "No email", style = MaterialTheme.typography.bodyLarge)
             }
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = { /*TODO*/ }) {

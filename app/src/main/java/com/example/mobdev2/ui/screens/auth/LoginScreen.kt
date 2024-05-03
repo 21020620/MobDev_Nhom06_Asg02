@@ -29,7 +29,6 @@ import com.example.mobdev2.ui.components.auth.LoginButtonGroup
 import com.example.mobdev2.ui.components.auth.PasswordField
 import com.example.mobdev2.ui.components.auth.PromptRow
 import com.example.mobdev2.ui.components.auth.Title
-import com.example.mobdev2.ui.screens.book.ShareModel
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.screens.destinations.BookHomeScreenDestination
 import com.example.mobdev2.ui.screens.destinations.LoginScreenDestination
