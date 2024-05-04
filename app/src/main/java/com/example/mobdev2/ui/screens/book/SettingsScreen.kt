@@ -197,11 +197,13 @@ fun ProfileCard() {
                     .clip(CircleShape)
             )
             Column(modifier = Modifier.padding(start = 16.dp)) {
+                val email = user?.email ?: "No email"
+                val name = user?.displayName ?: email.substring(0, email.indexOf('@'))
                 Text(
-                    text = user?.displayName ?: "Reader",
+                    text = name,
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight(700))
                 )
-                Text(text = user?.email ?: "No email", style = MaterialTheme.typography.bodyLarge)
+                Text(text = email, style = MaterialTheme.typography.bodyLarge)
             }
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = { /*TODO*/ }) {
