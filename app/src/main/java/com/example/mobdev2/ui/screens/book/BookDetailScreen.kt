@@ -26,6 +26,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -40,23 +43,39 @@ import com.example.mobdev2.R
 import com.example.mobdev2.ui.components.CustomButton
 import com.example.mobdev2.ui.components.book.BookDetailTopUI
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
+import com.example.mobdev2.ui.screens.destinations.BookDetailScreenDestination
+import com.example.mobdev2.ui.screens.destinations.BookForumScreenDestination
+import com.example.mobdev2.ui.screens.destinations.ChaptersDestination
 import com.example.mobdev2.ui.theme.figeronaFont
 import com.example.mobdev2.ui.theme.pacificoFont
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import org.koin.androidx.compose.koinViewModel
 
 @BookNavGraph
 @Composable
 @Destination
 fun BookDetailScreen(
-//    bookId: String,
-    navController: NavController? = null
+    bookID: String,
+    navController: NavController? = null,
+    navigator: DestinationsNavigator,
+    viewModel: BookDetailViewModel = koinViewModel()
 ) {
 
+    val book = viewModel.book
+
+    LaunchedEffect(key1 = bookID) {
+        viewModel.getBookDetails(bookID)
+    }
     Scaffold(
         topBar = { BookDetailTopBar(onBackClicked = {
             navController?.navigateUp()
         }, onAdd2LibClicked = { }) },
-        bottomBar = { BookDetailBottomBar(onBackClicked = { }, onShareClicked = { }) },
+        bottomBar = { BookDetailBottomBar(onForumClicked = { }, onChapterClicked = {
+            book?.let {
+                navigator.navigate(ChaptersDestination(bookData = it))
+            }
+        }) },
         content = { paddingValues ->
 
             Column(
@@ -71,30 +90,30 @@ fun BookDetailScreen(
                         .background(MaterialTheme.colorScheme.background)
                         .verticalScroll(rememberScrollState())
                 ) {
-                    val authors = "Dang"
-
-                    BookDetailTopUI(
-                        title = "Book Title",
-                        authors = authors,
-                        imageData = R.drawable.placeholder_cat,
-                    )
-
-                    Text(
-                        text = "Synopsis",
-                        fontSize = 20.sp,
-                        fontFamily = figeronaFont,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground,
-                        modifier = Modifier.padding(start = 12.dp, end = 8.dp),
+                    book?.let {
+                        BookDetailTopUI(
+                            title = it.title,
+                            authors = it.author,
+                            imageData = it.imageURL,
                         )
 
-                    Text(
-                        text = stringResource(id = R.string.book_synopsis),
-                        modifier = Modifier.padding(14.dp),
-                        fontFamily = figeronaFont,
-                        fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onBackground,
-                    )
+                        Text(
+                            text = "Synopsis",
+                            fontSize = 20.sp,
+                            fontFamily = figeronaFont,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground,
+                            modifier = Modifier.padding(start = 12.dp, end = 8.dp),
+                        )
+
+                        Text(
+                            text = it.synopsis,
+                            modifier = Modifier.padding(14.dp),
+                            fontFamily = figeronaFont,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onBackground,
+                        )
+                    }
                 }
             }
         })
@@ -154,7 +173,7 @@ fun BookDetailTopBar(
 
 @Composable
 fun BookDetailBottomBar(
-    onBackClicked: () -> Unit, onShareClicked: () -> Unit
+    onForumClicked: () -> Unit, onChapterClicked: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -166,12 +185,14 @@ fun BookDetailBottomBar(
             .padding(start = 40.dp)
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp))
-            .clickable { onBackClicked() }) {
+            .clickable { onForumClicked() }) {
             Icon(
                 painter = painterResource(id = R.drawable.forum),
-                contentDescription = stringResource(id = R.string.back_button_desc),
+                contentDescription = "Forum",
                 tint = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(5.dp).size(25.dp)
+                modifier = Modifier
+                    .padding(5.dp)
+                    .size(25.dp)
             )
         }
 
@@ -195,7 +216,7 @@ fun BookDetailBottomBar(
             .padding(end = 40.dp)
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp))
-            .clickable { onShareClicked() }) {
+            .clickable { onChapterClicked() }) {
             Icon(
                 imageVector = Icons.Outlined.Menu,
                 contentDescription = "Content",

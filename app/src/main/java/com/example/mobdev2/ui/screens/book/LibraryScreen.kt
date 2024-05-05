@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mobdev2.R
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
+import com.example.mobdev2.ui.screens.destinations.BookDetailScreenDestination
 import com.example.mobdev2.ui.theme.figeronaFont
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -55,7 +56,9 @@ fun LibraryScreen(
                 fileSize = "30MB",
                 date = "2024-25-04",
                 isExternalBook = true,
-                onReadClick = { /*TODO*/ }
+                onReadClick = { /*TODO*/
+                    navigator.navigate(BookDetailScreenDestination(bookID = "Z7sXjKwP6XL46c2CNW54"))
+                }
             ) {
 
             }
