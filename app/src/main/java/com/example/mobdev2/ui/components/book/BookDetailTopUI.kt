@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -43,7 +44,7 @@ fun BookDetailTopUI(
     imageData: Any?,
     progressPercent: String? = null
 ) {
-//    val context = LocalContext.current
+    val context = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -87,10 +88,9 @@ fun BookDetailTopUI(
                         .background(imageBackground)
                 ) {
                     AsyncImage(
-//                        model = ImageRequest.Builder(context)
-//                            .data(imageData)
-//                            .crossfade(true).build(),
-                        model = null,
+                        model = ImageRequest.Builder(context)
+                            .data(imageData)
+                            .crossfade(true).build(),
                         placeholder = painterResource(id = R.drawable.placeholder_cat),
                         contentDescription = null,
                         modifier = Modifier
@@ -113,7 +113,7 @@ fun BookDetailTopUI(
                         )
                         .fillMaxWidth(),
                     fontSize = 24.sp,
-//                    fontFamily = figeronaFont,
+                    fontFamily = figeronaFont,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold,

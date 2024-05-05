@@ -1,6 +1,7 @@
 package com.example.mobdev2.ui.screens.book
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -45,7 +46,7 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.mobdev2.R
-import com.example.mobdev2.model.Book
+import com.example.mobdev2.repo.model.Book
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.screens.destinations.BookDetailScreenDestination
 import com.example.mobdev2.ui.theme.figeronaFont
@@ -107,7 +108,7 @@ fun AllBookScreen(
                 BookItemCard(
                     bookList.value[idx],
                     onClick = {
-                        navigator.navigate(BookDetailScreenDestination)
+                        navigator.navigate(BookDetailScreenDestination(bookID = "Z7sXjKwP6XL46c2CNW54"))
                     }
                 )
                 Spacer(modifier = Modifier.height(6.dp))
@@ -118,13 +119,13 @@ fun AllBookScreen(
 @Composable
 fun BookItemCard(
     book: Book,
-    onClick: () -> Unit
+    onClick: (String) -> Unit
 ) {
     Card(
         modifier = Modifier
             .height(160.dp)
-            .fillMaxWidth(),
-        onClick = onClick,
+            .fillMaxWidth()
+            .clickable { onClick(book.title)},
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
                 2.dp
