@@ -8,7 +8,6 @@ import org.koin.core.annotation.Single
 @Module
 @ComponentScan("com.example.mobdev2")
 class AppModule {
-
     @Single
     fun provideFirestore(): FirebaseFirestore{
         return FirebaseFirestore.getInstance()

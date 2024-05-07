@@ -47,7 +47,6 @@ fun BookHomeScreen(
 
     LaunchedEffect(authState.value) {
         if (authState.value == null) {
-            println("Here")
             viewModel.navigateToLogin()
         }
     }
