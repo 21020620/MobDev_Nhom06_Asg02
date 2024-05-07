@@ -1,6 +1,5 @@
 package com.example.mobdev2.ui.screens.book
 
-import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,12 +20,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -38,17 +36,27 @@ import com.example.mobdev2.ui.components.CustomTopAppBar
 import com.example.mobdev2.ui.components.book.BookDetailTopUI
 import com.example.mobdev2.ui.components.simpleVerticalScrollbar
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
+import com.example.mobdev2.ui.screens.destinations.ReadBookScreenDestination
 import com.example.mobdev2.ui.theme.figeronaFont
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import org.koin.androidx.compose.koinViewModel
 
 @BookNavGraph
 @Destination
 @Composable
 fun Chapters (
+    viewModel: ReadBookViewModel = koinViewModel(),
     navController: NavController? = null,
+    navigator: DestinationsNavigator,
     bookData: Book
 ) {
-    val context = LocalContext.current
+
+    LaunchedEffect(key1 = true) {
+        viewModel.loadReaderData("Z7sXjKwP6XL46c2CNW54")
+    }
+    val readerItem = viewModel.chaptersState.readerData
+
 
     Scaffold(
         topBar = {
@@ -58,11 +66,9 @@ fun Chapters (
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                text = { Text(text = "Start") },
+                text = { Text(text = if (readerItem != null) "Resume" else "Start") },
                 onClick = {
-//                    val intent = Intent(context, ReaderActivity::class.java)
-//                    intent.putExtra(ReaderConstants.EXTRA_BOOK_ID, bookId.toInt())
-//                    context.startActivity(intent)
+                          navigator.navigate(ReadBookScreenDestination(bookID = "Z7sXjKwP6XL46c2CNW54"))
                 },
                 icon = {
                     Icon(
@@ -80,12 +86,12 @@ fun Chapters (
                 .background(MaterialTheme.colorScheme.background)
                 .padding(it)
         ) {
-            val authors = "Dang"
 
             BookDetailTopUI(
                 title = bookData.title,
                 authors = bookData.author,
                 imageData = bookData.imageURL,
+                progressPercent = readerItem?.getProgressPercent(bookData.chapters.size)
             )
 
             HorizontalDivider(
@@ -104,10 +110,8 @@ fun Chapters (
             ) {
                 items(bookData.chapters.size) { idx ->
                     ChapterItem(chapterTitle = bookData.chapters[idx].name, onClick = {
-//                        val intent = Intent(context, ReaderActivity::class.java)
-//                        intent.putExtra(ReaderConstants.EXTRA_BOOK_ID, bookId.toInt())
-//                        intent.putExtra(ReaderConstants.EXTRA_CHAPTER_IDX, idx)
-//                        context.startActivity(intent)
+                        viewModel.updateReaderProgress("Z7sXjKwP6XL46c2CNW54", idx, 0 )
+                        navigator.navigate(ReadBookScreenDestination(bookID = "Z7sXjKwP6XL46c2CNW54"))
                     })
                 }
             }

@@ -27,15 +27,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -43,9 +39,8 @@ import com.example.mobdev2.R
 import com.example.mobdev2.ui.components.CustomButton
 import com.example.mobdev2.ui.components.book.BookDetailTopUI
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
-import com.example.mobdev2.ui.screens.destinations.BookDetailScreenDestination
-import com.example.mobdev2.ui.screens.destinations.BookForumScreenDestination
 import com.example.mobdev2.ui.screens.destinations.ChaptersDestination
+import com.example.mobdev2.ui.screens.destinations.ReadBookScreenDestination
 import com.example.mobdev2.ui.theme.figeronaFont
 import com.example.mobdev2.ui.theme.pacificoFont
 import com.ramcosta.composedestinations.annotation.Destination
@@ -71,11 +66,18 @@ fun BookDetailScreen(
         topBar = { BookDetailTopBar(onBackClicked = {
             navController?.navigateUp()
         }, onAdd2LibClicked = { }) },
-        bottomBar = { BookDetailBottomBar(onForumClicked = { }, onChapterClicked = {
-            book?.let {
-                navigator.navigate(ChaptersDestination(bookData = it))
+        bottomBar = { BookDetailBottomBar(
+            onForumClicked = { },
+            onChapterClicked = {
+                book?.let {
+                    navigator.navigate(ChaptersDestination(bookData = it))
+                }
+            },
+            onStartReadingClicked = {
+                navigator.navigate(ReadBookScreenDestination(bookID = "Z7sXjKwP6XL46c2CNW54"))
             }
-        }) },
+        ) },
+
         content = { paddingValues ->
 
             Column(
@@ -149,7 +151,7 @@ fun BookDetailTopBar(
             modifier = Modifier.padding(bottom = 2.dp),
             color = MaterialTheme.colorScheme.onBackground,
             fontSize = 22.sp,
-            fontFamily = figeronaFont,
+            fontFamily = pacificoFont,
             fontStyle = MaterialTheme.typography.headlineMedium.fontStyle
         )
 
@@ -173,7 +175,7 @@ fun BookDetailTopBar(
 
 @Composable
 fun BookDetailBottomBar(
-    onForumClicked: () -> Unit, onChapterClicked: () -> Unit
+    onForumClicked: () -> Unit, onChapterClicked: () -> Unit, onStartReadingClicked: () -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -201,10 +203,10 @@ fun BookDetailBottomBar(
 
         CustomButton(
             surfaceModifier = Modifier
-                .width(180.dp)
+                .width(150.dp)
                 .height(45.dp),
-            onClick = {},
-            text = "Start Reading",
+            onClick = { onStartReadingClicked() },
+            text = "Read Now",
             fontSize = 15.sp,
             shape = RoundedCornerShape(30)
         )
