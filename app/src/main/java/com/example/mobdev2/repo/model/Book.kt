@@ -38,3 +38,19 @@ data class Chapter(
 ) :Serializable {
     constructor() : this(name = "", content = "")
 }
+
+data class ReaderData(
+    @SerializedName("book_id")
+    val bookID: String,
+    @SerializedName("last_chapter_index")
+    val lastChapterIndex: Int,
+    @SerializedName("last_chapter_offset")
+    val lastChapterOffset: Int,
+    @SerializedName("user_id")
+    val userID: String
+) :Serializable {
+    constructor() : this(bookID = "", lastChapterIndex = 0, lastChapterOffset = 0, userID = "")
+
+    fun getProgressPercent(totalChapters: Int) =
+        String.format("%.2f", ((lastChapterIndex + 1).toFloat() / totalChapters.toFloat()) * 100f)
+}

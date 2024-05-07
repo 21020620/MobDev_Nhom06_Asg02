@@ -44,6 +44,7 @@ fun BookDetailTopUI(
     imageData: Any?,
     progressPercent: String? = null
 ) {
+    println("progress percent: $progressPercent")
     val context = LocalContext.current
     Box(
         modifier = Modifier
@@ -126,7 +127,7 @@ fun BookDetailTopUI(
                         start = 12.dp, end = 8.dp, top = 4.dp
                     ),
                     fontSize = 18.sp,
-//                    fontFamily = figeronaFont,
+                    fontFamily = figeronaFont,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -140,7 +141,7 @@ fun BookDetailTopUI(
                             start = 12.dp, end = 8.dp, top = 8.dp
                         ),
                         fontSize = 16.sp,
-//                        fontFamily = figeronaFont,
+                        fontFamily = figeronaFont,
                         fontWeight = FontWeight.Medium,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
