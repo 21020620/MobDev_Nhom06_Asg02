@@ -67,7 +67,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.screens.destinations.ReadBookSettingsDestination
-import com.example.mobdev2.ui.theme.figeronaFont
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
@@ -186,7 +185,7 @@ fun ReadBookScreen(
                     modifier = Modifier.padding(start = 16.dp, top = 12.dp),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.SemiBold,
-                    fontFamily = figeronaFont,
+                    
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
@@ -248,7 +247,7 @@ fun ReadBookScreen(
                                             overflow = TextOverflow.Ellipsis,
                                             modifier = Modifier.animateContentSize(),
                                             color = MaterialTheme.colorScheme.onSurface,
-                                            fontFamily = figeronaFont
+                                            fontStyle = MaterialTheme.typography.titleLarge.fontStyle,
                                         )
                                     }
                                 },
@@ -281,7 +280,7 @@ fun ReadBookScreen(
                                         maxLines = 2,
                                         overflow = TextOverflow.Ellipsis,
                                         color = MaterialTheme.colorScheme.onSurface,
-                                        fontFamily = figeronaFont,
+                                        
                                         fontWeight = FontWeight.Medium
                                     )
                                 }

@@ -49,7 +49,7 @@ import com.example.mobdev2.R
 import com.example.mobdev2.repo.model.Book
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.screens.destinations.BookDetailScreenDestination
-import com.example.mobdev2.ui.theme.figeronaFont
+//import com.example.mobdev2.ui.theme.figeronaFont
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
@@ -170,9 +170,8 @@ fun BookItemCard(
                             start = 12.dp, end = 8.dp
                         )
                         .fillMaxWidth(),
-                    fontStyle = MaterialTheme.typography.headlineMedium.fontStyle,
+                    fontStyle = MaterialTheme.typography.displayMedium.fontStyle,
                     fontSize = 18.sp,
-                    fontFamily = figeronaFont,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -185,7 +184,6 @@ fun BookItemCard(
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 2,
                     fontStyle = MaterialTheme.typography.bodySmall.fontStyle,
-                    fontFamily = figeronaFont,
                     fontSize = 14.sp,
                 )
 
@@ -198,7 +196,6 @@ fun BookItemCard(
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
                     fontStyle = MaterialTheme.typography.bodyMedium.fontStyle,
-                    fontFamily = figeronaFont
                 )
 
                 Text(
@@ -208,7 +205,6 @@ fun BookItemCard(
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
                     fontStyle = MaterialTheme.typography.bodySmall.fontStyle,
-                    fontFamily = figeronaFont,
                     fontSize = 13.sp
                 )
 

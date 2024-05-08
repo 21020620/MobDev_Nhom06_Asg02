@@ -61,6 +61,7 @@ dependencies {
 
     implementation ("androidx.compose.runtime:runtime-livedata:1.6.1")
     implementation(libs.play.services.auth)
+    implementation(libs.androidx.ui.text.google.fonts)
     debugImplementation("androidx.compose.ui:ui-tooling:1.6.1")
     implementation("androidx.compose.ui:ui-tooling-preview:1.6.1")
     implementation(libs.androidx.core.ktx)

@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -16,7 +17,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import com.example.mobdev2.ui.theme.Purple40
 
 @Composable
 @Preview
@@ -28,7 +28,7 @@ fun CustomButton(
     text: String = "",
     fontSize: TextUnit = TextUnit.Unspecified,
     shape: Shape = RoundedCornerShape(16),
-    colors: ButtonColors = ButtonDefaults.buttonColors(containerColor = Purple40),
+    colors: ButtonColors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
     icon: @Composable (() -> Unit)? = null,
     content: @Composable (RowScope.() -> Unit)? = null,
 ) {
@@ -62,7 +62,7 @@ fun CustomButton(
                 }
                 Text(
                     text = text,
-                    color = Purple40,
+                    color = MaterialTheme.colorScheme.primary,
                     fontSize = fontSize
                 )
                 content?.invoke(this)

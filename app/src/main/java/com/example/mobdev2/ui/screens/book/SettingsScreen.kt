@@ -59,14 +59,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow.Companion as TextOverflow1
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mobdev2.R
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
-import com.example.mobdev2.ui.theme.figeronaFont
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -112,7 +110,7 @@ fun SettingsScreen(
                                     overflow = TextOverflow1.Ellipsis,
                                     modifier = Modifier.padding(bottom = 2.dp),
                                     fontSize = 22.sp,
-                                    fontFamily = figeronaFont,
+                                    
                                     fontStyle = MaterialTheme.typography.headlineMedium.fontStyle
                             )
                         },

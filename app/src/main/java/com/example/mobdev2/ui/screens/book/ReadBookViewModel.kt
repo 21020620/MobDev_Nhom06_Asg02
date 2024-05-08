@@ -23,7 +23,6 @@ import com.example.mobdev2.repo.BookRepository
 import com.example.mobdev2.repo.ReaderDataRepository
 import com.example.mobdev2.repo.model.Book
 import com.example.mobdev2.repo.model.ReaderData
-import com.example.mobdev2.ui.theme.figeronaFont
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -59,8 +58,8 @@ sealed class ReaderFont(val id: String, val name: String, val fontFamily: FontFa
     data object Dyslexic :
         ReaderFont("dyslexic", "OpenDyslexic", FontFamily(Font(R.font.reader_inter_font)))
 
-    @Keep
-    data object Lora : ReaderFont("figerona", "Figerona", figeronaFont)
+//    @Keep
+//    data object Lora : ReaderFont("figerona", "Figerona", figeronaFont)
 }
 
 data class ReaderScreenState(

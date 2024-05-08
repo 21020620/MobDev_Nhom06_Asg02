@@ -41,8 +41,6 @@ import com.example.mobdev2.ui.components.book.BookDetailTopUI
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.screens.destinations.ChaptersDestination
 import com.example.mobdev2.ui.screens.destinations.ReadBookScreenDestination
-import com.example.mobdev2.ui.theme.figeronaFont
-import com.example.mobdev2.ui.theme.pacificoFont
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
@@ -102,7 +100,7 @@ fun BookDetailScreen(
                         Text(
                             text = "Synopsis",
                             fontSize = 20.sp,
-                            fontFamily = figeronaFont,
+                            fontStyle = MaterialTheme.typography.bodyMedium.fontStyle,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onBackground,
                             modifier = Modifier.padding(start = 12.dp, end = 8.dp),
@@ -111,7 +109,7 @@ fun BookDetailScreen(
                         Text(
                             text = it.synopsis,
                             modifier = Modifier.padding(14.dp),
-                            fontFamily = figeronaFont,
+                            fontStyle = MaterialTheme.typography.bodyMedium.fontStyle,
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.onBackground,
                         )
@@ -151,7 +149,6 @@ fun BookDetailTopBar(
             modifier = Modifier.padding(bottom = 2.dp),
             color = MaterialTheme.colorScheme.onBackground,
             fontSize = 22.sp,
-            fontFamily = pacificoFont,
             fontStyle = MaterialTheme.typography.headlineMedium.fontStyle
         )
 

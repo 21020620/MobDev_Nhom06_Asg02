@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.sp
 import com.example.mobdev2.R
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.screens.destinations.BookDetailScreenDestination
-import com.example.mobdev2.ui.theme.figeronaFont
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -124,7 +123,6 @@ private fun LibraryCard(
                     text = title,
                     fontStyle = MaterialTheme.typography.headlineMedium.fontStyle,
                     fontSize = 20.sp,
-                    fontFamily = figeronaFont,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -136,7 +134,6 @@ private fun LibraryCard(
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     fontStyle = MaterialTheme.typography.bodySmall.fontStyle,
-                    fontFamily = figeronaFont,
                     fontWeight = FontWeight.Medium,
                     fontSize = 16.sp,
                 )
@@ -146,7 +143,6 @@ private fun LibraryCard(
                 Row {
                     Text(
                         text = fileSize,
-                        fontFamily = figeronaFont,
                         color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Light,
                         fontSize = 14.sp,
@@ -161,7 +157,6 @@ private fun LibraryCard(
                     )
                     Text(
                         text = date,
-                        fontFamily = figeronaFont,
                         color = MaterialTheme.colorScheme.onSurface,
                         fontWeight = FontWeight.Light,
                         fontSize = 14.sp,
@@ -214,7 +209,7 @@ private fun LibraryCardButton(
             Text(
                 text = text,
                 fontWeight = FontWeight.Medium,
-                fontFamily = figeronaFont,
+                
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(start = 2.dp),

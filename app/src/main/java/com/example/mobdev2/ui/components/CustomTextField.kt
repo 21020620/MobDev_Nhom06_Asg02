@@ -28,8 +28,6 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import com.example.mobdev2.R
-import com.example.mobdev2.ui.theme.Grey40
-import com.example.mobdev2.ui.theme.Purple40
 
 @Composable
 fun ExpandableTextField(
@@ -44,8 +42,8 @@ fun ExpandableTextField(
     trailingIcon: @Composable (() -> Unit)? = null,
     shape: Shape = OutlinedTextFieldDefaults.shape,
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor = Purple40,
-        unfocusedBorderColor = Purple40,
+        focusedBorderColor = MaterialTheme.colorScheme.primary,
+        unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f),
         errorLeadingIconColor = MaterialTheme.colorScheme.error,
     ),
     isError: Boolean = false,
@@ -95,7 +93,10 @@ fun ExpandableTextField(
                     !isVisible     -> PasswordVisualTransformation()
                     else           -> VisualTransformation.None
                 },
-                textStyle = TextStyle(fontSize = 15.sp, color = Grey40),
+                textStyle = TextStyle(
+                    color = MaterialTheme.colorScheme.onSurface,
+                    fontSize = 14.sp
+                ),
                 maxLines = 1,
                 shape = RoundedCornerShape(16),
                 colors = colors,

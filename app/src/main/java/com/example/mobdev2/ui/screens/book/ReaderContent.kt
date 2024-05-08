@@ -28,8 +28,6 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.mobdev2.repo.model.Chapter
-import com.example.mobdev2.ui.theme.figeronaFont
-import com.example.mobdev2.ui.theme.pacificoFont
 
 
 private fun chunkText(text: String): List<String> {
@@ -81,10 +79,7 @@ private fun ChapterLazyItemItem(
         Text(
             modifier = Modifier.padding(start = 12.dp, end = 4.dp, top = 10.dp),
             text = chapter.name,
-            fontSize = 24.sp,
-            lineHeight = 32.sp,
-            fontFamily = pacificoFont,
-            fontWeight = FontWeight.Medium,
+            fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.88f)
         )
         Spacer(modifier = Modifier.height(12.dp))
@@ -92,9 +87,8 @@ private fun ChapterLazyItemItem(
         paragraphs.forEach { para->
             Text(
                 text = para,
-                fontSize = state.fontSize.sp,
-                lineHeight = 25.sp,
-                fontFamily = figeronaFont,
+                fontStyle = MaterialTheme.typography.bodySmall.fontStyle,
+                
                 modifier = Modifier.padding(start = 14.dp, end = 14.dp, bottom = 8.dp),
             )
 

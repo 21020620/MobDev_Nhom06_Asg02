@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -24,7 +25,6 @@ import androidx.compose.ui.unit.sp
 import com.example.mobdev2.R
 import com.example.mobdev2.ui.components.CustomButton
 import com.example.mobdev2.ui.components.ExpandableTextField
-import com.example.mobdev2.ui.theme.Purple40
 
 @Composable
 fun LoginButtonGroup(
@@ -55,7 +55,7 @@ fun LoginButtonGroup(
                 modifier = Modifier
                     .height(2.dp)
                     .weight(0.7f)
-                    .background(Purple40)
+                    .background(MaterialTheme.colorScheme.surface)
             )
 
             Text(
@@ -63,7 +63,7 @@ fun LoginButtonGroup(
                 text = "Or With",
                 style = TextStyle(
                     textAlign = TextAlign.Center,
-                    color = Purple40
+                    color = MaterialTheme.colorScheme.onSurface,
                 ),
             )
 
@@ -71,7 +71,7 @@ fun LoginButtonGroup(
                 modifier = Modifier
                     .height(2.dp)
                     .weight(0.7f)
-                    .background(Purple40)
+                    .background(MaterialTheme.colorScheme.surface)
             )
         }
 
@@ -102,7 +102,7 @@ fun LoginButtonGroup(
         PromptRow(
             normalText = "Don't have an account?",
             highlightedText = "Sign Up",
-            highlightColor = Purple40,
+            highlightColor = MaterialTheme.colorScheme.primary,
             onClick = signUp
         )
     }
@@ -132,7 +132,7 @@ fun SignUpButtonGroup(
         PromptRow(
             normalText = "Already have an account?",
             highlightedText = "Login",
-            highlightColor = Purple40,
+            highlightColor = MaterialTheme.colorScheme.primary,
             onClick = login
         )
     }
