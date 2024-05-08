@@ -59,6 +59,8 @@ android {
 
 dependencies {
 
+    implementation ("androidx.compose.runtime:runtime-livedata:1.6.1")
+    implementation(libs.play.services.auth)
     debugImplementation("androidx.compose.ui:ui-tooling:1.6.1")
     implementation("androidx.compose.ui:ui-tooling-preview:1.6.1")
     implementation(libs.androidx.core.ktx)
@@ -88,6 +90,8 @@ dependencies {
     implementation(libs.koin.androidx.compose)
     ksp(libs.koin.compiler)
 
+    implementation ("com.google.code.gson:gson:2.10.1")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -95,4 +99,5 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+
 }

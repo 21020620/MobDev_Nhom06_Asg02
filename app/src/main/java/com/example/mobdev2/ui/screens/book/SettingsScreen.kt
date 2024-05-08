@@ -32,6 +32,7 @@ import androidx.compose.material.icons.outlined.VolumeUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -45,6 +46,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -66,21 +68,31 @@ import com.example.mobdev2.R
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.theme.figeronaFont
 import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import org.koin.androidx.compose.koinViewModel
+import androidx.compose.ui.text.style.TextOverflow.Companion as TextOverflow1
+
 
 @OptIn(ExperimentalMaterial3Api::class)
 @BookNavGraph
 @Composable
 @Destination
 fun SettingsScreen(
-        navController: NavController? = null,
-        navigator: DestinationsNavigator,
-        shareModel: ShareModel
+    navController: NavController? = null,
+    navigator: DestinationsNavigator,
+    viewModel: SettingsScreenViewModel = koinViewModel()
 ) {
 
     val snackBarHostState = remember { SnackbarHostState() }
+    val isSigningOut = viewModel.isSigningOut.collectAsState()
+
+    if(isSigningOut.value) {
+        CircularProgressIndicator()
+        navigator.clearBackStack("book_graph")
+    }
 
     Scaffold(
             topBar = {
@@ -162,7 +174,7 @@ fun SettingsScreen(
                 )
                 NotificationSetting()
                 HorizontalDivider()
-                Logout(navigator, navController, shareModel)
+                Logout(viewModel)
             }
         }
     }
@@ -171,6 +183,7 @@ fun SettingsScreen(
 @Composable
 @Preview
 fun ProfileCard() {
+    val user = FirebaseAuth.getInstance().currentUser
     Card(
             modifier = Modifier.padding(20.dp).fillMaxWidth().wrapContentHeight(),
             shape = MaterialTheme.shapes.large,
@@ -194,14 +207,13 @@ fun ProfileCard() {
                     modifier = Modifier.size(64.dp).clip(CircleShape)
             )
             Column(modifier = Modifier.padding(start = 16.dp)) {
+                val email = user?.email ?: "No email"
+                val name = user?.displayName ?: email.substring(0, email.indexOf('@'))
                 Text(
-                        text = "Donald Trump",
-                        style =
-                                MaterialTheme.typography.titleLarge.copy(
-                                        fontWeight = FontWeight(700)
-                                )
+                    text = name,
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight(700))
                 )
-                Text(text = "donaldtrump@example.com", style = MaterialTheme.typography.bodyLarge)
+                Text(text = email, style = MaterialTheme.typography.bodyLarge)
             }
             Spacer(modifier = Modifier.weight(1f))
             IconButton(onClick = { /*TODO*/}) {
@@ -387,44 +399,40 @@ fun NotificationSetting() {
         }
     }
 }
-
 @Composable
 fun Logout(
-        navigator: DestinationsNavigator,
-        navController: NavController? = null,
-        shareModel: ShareModel
+    viewModel: SettingsScreenViewModel
 ) {
     Card(
-            modifier =
-                    Modifier.padding(20.dp).fillMaxWidth().wrapContentHeight().clickable {
-                        Firebase.auth.signOut()
-                        shareModel.navigateToLogin.value = true
-                    },
-            shape = MaterialTheme.shapes.large,
-            colors =
-                    CardDefaults.cardColors(
-                            containerColor =
-                                    MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
-                    ),
+        modifier = Modifier
+            .padding(20.dp)
+            .fillMaxWidth()
+            .wrapContentHeight()
+            .clickable {
+                viewModel.setIsLoading()
+                Firebase.auth.signOut()
+            },
+        shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
+        ),
     ) {
         Row(
-                modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
             Icon(
-                    imageVector = Icons.Outlined.ArrowBackIosNew,
-                    contentDescription = "logout",
-                    modifier = Modifier.padding(end = 10.dp)
+                imageVector = Icons.Outlined.ArrowBackIosNew,
+                contentDescription = "logout",
+                modifier = Modifier.padding(end = 10.dp)
             )
             Column {
                 Text(
-                        text = "Logout",
-                        style =
-                                MaterialTheme.typography.titleLarge.copy(
-                                        fontWeight = FontWeight(700)
-                                )
+                    text = "Logout",
+                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight(700))
                 )
+
             }
         }
     }

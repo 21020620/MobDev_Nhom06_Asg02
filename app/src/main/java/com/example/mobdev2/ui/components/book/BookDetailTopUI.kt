@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -43,7 +44,8 @@ fun BookDetailTopUI(
     imageData: Any?,
     progressPercent: String? = null
 ) {
-//    val context = LocalContext.current
+    println("progress percent: $progressPercent")
+    val context = LocalContext.current
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -87,10 +89,9 @@ fun BookDetailTopUI(
                         .background(imageBackground)
                 ) {
                     AsyncImage(
-//                        model = ImageRequest.Builder(context)
-//                            .data(imageData)
-//                            .crossfade(true).build(),
-                        model = null,
+                        model = ImageRequest.Builder(context)
+                            .data(imageData)
+                            .crossfade(true).build(),
                         placeholder = painterResource(id = R.drawable.placeholder_cat),
                         contentDescription = null,
                         modifier = Modifier
@@ -113,7 +114,7 @@ fun BookDetailTopUI(
                         )
                         .fillMaxWidth(),
                     fontSize = 24.sp,
-//                    fontFamily = figeronaFont,
+                    fontFamily = figeronaFont,
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
                     fontWeight = FontWeight.Bold,
@@ -126,7 +127,7 @@ fun BookDetailTopUI(
                         start = 12.dp, end = 8.dp, top = 4.dp
                     ),
                     fontSize = 18.sp,
-//                    fontFamily = figeronaFont,
+                    fontFamily = figeronaFont,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis,
@@ -140,7 +141,7 @@ fun BookDetailTopUI(
                             start = 12.dp, end = 8.dp, top = 8.dp
                         ),
                         fontSize = 16.sp,
-//                        fontFamily = figeronaFont,
+                        fontFamily = figeronaFont,
                         fontWeight = FontWeight.Medium,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
