@@ -218,4 +218,5 @@ class ReadBookViewModel(
             ((1f - visiblePortion / firstVisibleItem.size.toFloat())).coerceIn(0f, 1f)
         }
     }
+
 }

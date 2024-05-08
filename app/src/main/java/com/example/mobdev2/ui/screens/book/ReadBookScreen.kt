@@ -66,8 +66,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
+import com.example.mobdev2.ui.screens.destinations.ReadBookSettingsDestination
 import com.example.mobdev2.ui.theme.figeronaFont
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -83,6 +85,7 @@ object ReaderConstants {
 fun ReadBookScreen(
     bookID: String,
     viewModel: ReadBookViewModel = koinViewModel(),
+    navigator: DestinationsNavigator,
 ) {
     // Hide reader menu on back press.
     BackHandler(viewModel.state.showReaderMenu) {
@@ -304,7 +307,9 @@ fun ReadBookScreen(
                 ) {
                     BottomBar(
                         onNavigateBeforeClick = { navigateToPreviousChapter() },
-                        onSettingsClick = { /*TODO*/ },
+                        onSettingsClick = {
+                            navigator.navigate(ReadBookSettingsDestination)
+                        },
                         onPlayStopAudioClick = { /*TODO*/ },
                         onMenuClick = { coroutineScope.launch { drawerState.open() } },
                         onNavigateNextClick = { navigateToNextChapter() }
