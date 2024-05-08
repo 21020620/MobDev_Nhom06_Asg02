@@ -51,12 +51,12 @@ sealed class ReaderFont(val id: String, val name: String, val fontFamily: FontFa
     @Keep
     data object SansSerif : ReaderFont("sans-serif", "SansSerif", FontFamily.SansSerif)
 
-    @Keep
-    data object Inter : ReaderFont("inter", "Inter", FontFamily(Font(R.font.reader_inter_font)))
-
-    @Keep
-    data object Dyslexic :
-        ReaderFont("dyslexic", "OpenDyslexic", FontFamily(Font(R.font.reader_inter_font)))
+//    @Keep
+//    data object Inter : ReaderFont("inter", "Inter", FontFamily(Font(R.font.reader_inter_font)))
+//
+//    @Keep
+//    data object Dyslexic :
+//        ReaderFont("dyslexic", "OpenDyslexic", FontFamily(Font(R.font.reader_inter_font)))
 
 //    @Keep
 //    data object Lora : ReaderFont("figerona", "Figerona", figeronaFont)
@@ -86,7 +86,7 @@ class ReadBookViewModel(
     var state by mutableStateOf(
         ReaderScreenState(
             fontFamily = ReaderFont.Cursive,
-            fontSize = 18
+            fontSize = 14
         )
     )
 
@@ -218,4 +218,7 @@ class ReadBookViewModel(
         }
     }
 
+    fun setFontFamily(fontFamily: ReaderFont) {
+        state = state.copy(fontFamily = fontFamily)
+    }
 }

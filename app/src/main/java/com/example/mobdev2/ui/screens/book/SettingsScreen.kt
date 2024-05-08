@@ -1,5 +1,6 @@
 package com.example.mobdev2.ui.screens.book
 
+import android.app.Application
 import android.content.Context
 import android.media.AudioManager
 import androidx.compose.foundation.Image
@@ -48,6 +49,7 @@ import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -62,6 +64,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavController
 import com.example.mobdev2.R
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
@@ -83,7 +86,6 @@ fun SettingsScreen(
     navigator: DestinationsNavigator,
     viewModel: SettingsScreenViewModel = koinViewModel()
 ) {
-
     val snackBarHostState = remember { SnackbarHostState() }
     val isSigningOut = viewModel.isSigningOut.collectAsState()
 
@@ -109,8 +111,6 @@ fun SettingsScreen(
                                     maxLines = 1,
                                     overflow = TextOverflow1.Ellipsis,
                                     modifier = Modifier.padding(bottom = 2.dp),
-                                    fontSize = 22.sp,
-                                    
                                     fontStyle = MaterialTheme.typography.headlineMedium.fontStyle
                             )
                         },
@@ -135,9 +135,10 @@ fun SettingsScreen(
     ) { paddingValues ->
         Column(
                 modifier =
-                        Modifier.fillMaxSize()
-                                .background(MaterialTheme.colorScheme.background)
-                                .padding(paddingValues)
+                Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+                    .padding(paddingValues)
         ) {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 ProfileCard()
@@ -150,7 +151,7 @@ fun SettingsScreen(
                                 ),
                         modifier = Modifier.padding(top = 20.dp, start = 20.dp)
                 )
-                ThemeSetting()
+                ThemeSetting(viewModel)
                 HorizontalDivider()
                 Text(
                         text = "Sound",
@@ -160,7 +161,7 @@ fun SettingsScreen(
                                 ),
                         modifier = Modifier.padding(top = 20.dp, start = 20.dp)
                 )
-                SoundSetting()
+                SoundSetting(viewModel)
                 HorizontalDivider()
                 Text(
                         text = "Notifications",
@@ -183,7 +184,10 @@ fun SettingsScreen(
 fun ProfileCard() {
     val user = FirebaseAuth.getInstance().currentUser
     Card(
-            modifier = Modifier.padding(20.dp).fillMaxWidth().wrapContentHeight(),
+            modifier = Modifier
+                .padding(20.dp)
+                .fillMaxWidth()
+                .wrapContentHeight(),
             shape = MaterialTheme.shapes.large,
             colors =
                     CardDefaults.cardColors(
@@ -202,7 +206,9 @@ fun ProfileCard() {
                                     id = R.drawable.profile_picture
                             ), // Replace with your actual resource
                     contentDescription = "Profile Picture",
-                    modifier = Modifier.size(64.dp).clip(CircleShape)
+                    modifier = Modifier
+                        .size(64.dp)
+                        .clip(CircleShape)
             )
             Column(modifier = Modifier.padding(start = 16.dp)) {
                 val email = user?.email ?: "No email"
@@ -226,14 +232,20 @@ fun ProfileCard() {
 }
 
 @Composable
-@Preview
-fun ThemeSetting() {
+fun ThemeSetting(
+    viewModel: SettingsScreenViewModel
+) {
     var currentTheme by remember { mutableStateOf(0) }
     Card(
             modifier =
-                    Modifier.padding(20.dp).fillMaxWidth().wrapContentHeight().clickable {
-                        // Change theme here
-                    },
+            Modifier
+                .padding(20.dp)
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .clickable {
+                    viewModel.toggleTheme()
+                    currentTheme = (currentTheme + 1) % 2
+                },
             shape = MaterialTheme.shapes.large,
             colors =
                     CardDefaults.cardColors(
@@ -262,10 +274,7 @@ fun ThemeSetting() {
             Column {
                 Text(
                         text = "Change Theme",
-                        style =
-                                MaterialTheme.typography.titleLarge.copy(
-                                        fontWeight = FontWeight(700)
-                                )
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight(700))
                 )
             }
         }
@@ -273,65 +282,58 @@ fun ThemeSetting() {
 }
 
 @Composable
-@Preview
-fun SoundSetting() {
-    val context = LocalContext.current
-    val audioManager = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-    val currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
-    val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
-    var sliderPosition by remember { mutableFloatStateOf(currentVolume.toFloat() / maxVolume) }
+fun SoundSetting(
+    viewModel : SettingsScreenViewModel
+) {
+    var sliderPosition by remember { mutableStateOf(viewModel.currentVolume) }
     Card(
-            modifier = Modifier.padding(20.dp).fillMaxWidth().wrapContentHeight(),
-            shape = MaterialTheme.shapes.large,
-            colors =
-                    CardDefaults.cardColors(
-                            containerColor =
-                                    MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
-                    ),
+        modifier = Modifier.padding(20.dp).fillMaxWidth().wrapContentHeight(),
+        shape = MaterialTheme.shapes.large,
+        colors =
+        CardDefaults.cardColors(
+            containerColor =
+            MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
+        ),
     ) {
         Row(
-                modifier = Modifier.padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
             if (sliderPosition > 0.5f) {
                 Icon(
-                        imageVector = Icons.Outlined.VolumeUp,
-                        contentDescription = "volume up",
-                        modifier = Modifier.padding(end = 10.dp)
+                    imageVector = Icons.Outlined.VolumeUp,
+                    contentDescription = "volume up",
+                    modifier = Modifier.padding(end = 10.dp)
                 )
             } else if (sliderPosition == 0f) {
                 Icon(
-                        imageVector = Icons.Outlined.VolumeMute,
-                        contentDescription = "mute",
-                        modifier = Modifier.padding(end = 10.dp)
+                    imageVector = Icons.Outlined.VolumeMute,
+                    contentDescription = "mute",
+                    modifier = Modifier.padding(end = 10.dp)
                 )
             } else {
                 Icon(
-                        imageVector = Icons.Outlined.VolumeDown,
-                        contentDescription = "volume down",
-                        modifier = Modifier.padding(end = 10.dp)
+                    imageVector = Icons.Outlined.VolumeDown,
+                    contentDescription = "volume down",
+                    modifier = Modifier.padding(end = 10.dp)
                 )
             }
 
             Column {
                 Text(
-                        text = "Audio Volume",
-                        style =
-                                MaterialTheme.typography.titleLarge.copy(
-                                        fontWeight = FontWeight(700)
-                                )
+                    text = "Audio Volume",
+                    style =
+                    MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight(700)
+                    )
                 )
                 Slider(
-                        value = sliderPosition,
-                        onValueChange = {
-                            sliderPosition = it
-                            audioManager.setStreamVolume(
-                                    AudioManager.STREAM_MUSIC,
-                                    (it * maxVolume).toInt(),
-                                    0
-                            )
-                        }
+                    value = sliderPosition,
+                    onValueChange = {
+                        sliderPosition = it
+                        viewModel.updateVolume(it)
+                    }
                 )
             }
         }
@@ -344,10 +346,11 @@ fun NotificationSetting() {
     var boolean by remember { mutableStateOf(true) }
     Card(
             modifier =
-                    Modifier.padding(20.dp)
-                            .fillMaxWidth()
-                            .wrapContentHeight()
-                            .clickable { /* handle notification here */},
+            Modifier
+                .padding(20.dp)
+                .fillMaxWidth()
+                .wrapContentHeight()
+                .clickable { /* handle notification here */ },
             shape = MaterialTheme.shapes.large,
             colors =
                     CardDefaults.cardColors(
@@ -377,10 +380,7 @@ fun NotificationSetting() {
             Column {
                 Text(
                         text = "Notifications",
-                        style =
-                                MaterialTheme.typography.titleLarge.copy(
-                                        fontWeight = FontWeight(700)
-                                )
+                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight(700))
                 )
                 if (boolean) {
                     Text(
@@ -428,7 +428,7 @@ fun Logout(
             Column {
                 Text(
                     text = "Logout",
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight(700))
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight(700))
                 )
 
             }

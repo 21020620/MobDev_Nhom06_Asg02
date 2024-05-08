@@ -143,8 +143,6 @@ fun ChapterItem(chapterTitle: String, onClick: () -> Unit) {
                 text = chapterTitle,
                 fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
                 color = MaterialTheme.colorScheme.onSurface,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
             )
 
             Icon(

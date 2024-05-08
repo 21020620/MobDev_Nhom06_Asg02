@@ -170,7 +170,7 @@ fun BookItemCard(
                             start = 12.dp, end = 8.dp
                         )
                         .fillMaxWidth(),
-                    fontStyle = MaterialTheme.typography.displayMedium.fontStyle,
+                    fontStyle = MaterialTheme.typography.displayLarge.fontStyle,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     maxLines = 2,
@@ -195,7 +195,7 @@ fun BookItemCard(
                     color = MaterialTheme.colorScheme.onSurface,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.SemiBold,
-                    fontStyle = MaterialTheme.typography.bodyMedium.fontStyle,
+                    fontStyle = MaterialTheme.typography.bodySmall.fontStyle,
                 )
 
                 Text(

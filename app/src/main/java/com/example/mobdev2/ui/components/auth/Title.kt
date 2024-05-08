@@ -5,6 +5,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.font.FontWeight
 
 @Composable
 fun Title(
@@ -20,7 +21,7 @@ fun Title(
             )
             Text(
                 text = subtitle,
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight(700)),
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }

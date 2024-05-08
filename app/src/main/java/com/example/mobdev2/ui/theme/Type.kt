@@ -30,6 +30,27 @@ val displayFontFamily = FontFamily(
     )
 )
 
+val sanSerif = FontFamily(
+    Font(
+        googleFont = GoogleFont("Roboto"),
+        fontProvider = provider,
+    )
+)
+
+val serif = FontFamily(
+    Font(
+        googleFont = GoogleFont("Merriweather"),
+        fontProvider = provider,
+    )
+)
+
+val georgia = FontFamily(
+    Font(
+        googleFont = GoogleFont("Lora"),
+        fontProvider = provider,
+    )
+)
+
 // Default Material 3 typography values
 val baseline = Typography()
 
