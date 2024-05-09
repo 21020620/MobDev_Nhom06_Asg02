@@ -16,17 +16,21 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,17 +38,18 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import com.example.mobdev2.CachingResults
 import com.example.mobdev2.R
 import com.example.mobdev2.repo.model.Book
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
@@ -63,6 +68,9 @@ fun AllBookScreen(
 ) {
 
     val bookList = viewModel.bookList.collectAsState()
+    val isSearching = viewModel.isSearching.collectAsState()
+    val searchString = viewModel.searchString.collectAsState()
+    val listType = viewModel.listType.collectAsState()
 
     if(bookList.value.isEmpty()) {
         LaunchedEffect(Unit) {
@@ -85,13 +93,45 @@ fun AllBookScreen(
     Scaffold(
         topBar = {
             TopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                ),
                 title = {
-                    Text(text = "All Books")
+                    if(isSearching.value)
+                        TextField(
+                            value = searchString.value,
+                            onValueChange = viewModel::updateSearchString,
+                            modifier = Modifier
+                                .padding(start = 5.dp, end = 20.dp)
+                                .height(50.dp)
+                                .fillMaxWidth(),
+                            textStyle = TextStyle(fontSize = 16.sp),
+                            placeholder = {
+                                Text("Search")
+                            }
+                        )
+                    else
+                        Text(
+                            text = listType.value,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(bottom = 2.dp),
+                            fontSize = 22.sp,
+                            fontStyle = MaterialTheme.typography.headlineMedium.fontStyle
+                        )
+
                 },
                 actions = {
-                    IconButton(onClick = { /*TODO*/ }) {
+                    IconButton(onClick = viewModel::updateSearchState) {
                         Icon(
-                           imageVector = Icons.Default.Favorite,
+                            imageVector = if(isSearching.value) Icons.Default.Cancel else Icons.Default.Search,
+                            contentDescription = "Search for books"
+                        )
+                    }
+                    IconButton(onClick = viewModel::updateListType) {
+                        Icon(
+                            imageVector = if(listType.value == "All Books") Icons.Outlined.FavoriteBorder else Icons.Outlined.Favorite,
                             contentDescription = "Show recommendation books"
                         )
                     }
@@ -104,14 +144,51 @@ fun AllBookScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            items(bookList.value.size) { idx ->
-                BookItemCard(
-                    bookList.value[idx],
-                    onClick = {
-                        navigator.navigate(BookDetailScreenDestination(bookID = "Z7sXjKwP6XL46c2CNW54"))
+            if(!isSearching.value) {
+                if(listType.value == "All Books") {
+                    items(bookList.value.size) { idx ->
+                        BookItemCard(
+                            bookList.value[idx],
+                            onClick = {
+                                navigator.navigate(BookDetailScreenDestination(bookID = bookList.value[idx].id))
+                            }
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
                     }
-                )
-                Spacer(modifier = Modifier.height(6.dp))
+                } else {
+                    bookList.value.filter {
+                        it.subjects.intersect(CachingResults.currentUser.favouriteTags.toSet()).isNotEmpty()
+                    }.map { it ->
+                        item(
+                            key = it.title
+                        ) {
+                            BookItemCard(
+                                book = it
+                            ) { bookID ->
+                                navigator.navigate(BookDetailScreenDestination(bookID = bookID))
+                            }
+                            Spacer(modifier = Modifier.height(6.dp))
+                        }
+                    }
+                }
+            } else {
+                bookList.value
+                    .filter {
+                        it.title.contains(searchString.value, true)
+                    }
+                    .map { it ->
+                        item(
+                            key = it.title
+                        ) {
+                            BookItemCard(
+                                it,
+                                onClick = { bookID ->
+                                    navigator.navigate(BookDetailScreenDestination(bookID = bookID))
+                                }
+                            )
+                            Spacer(modifier = Modifier.height(6.dp))
+                        }
+                    }
             }
         }
     }
@@ -125,7 +202,7 @@ fun BookItemCard(
         modifier = Modifier
             .height(160.dp)
             .fillMaxWidth()
-            .clickable { onClick(book.title)},
+            .clickable { onClick(book.id) },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
                 2.dp
