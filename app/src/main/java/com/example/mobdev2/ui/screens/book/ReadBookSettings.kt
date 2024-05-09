@@ -42,6 +42,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,15 +52,11 @@ import androidx.navigation.NavController
 import com.example.mobdev2.R
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.theme.georgia
-import com.example.mobdev2.ui.theme.sanSerif
-import com.example.mobdev2.ui.theme.serif
 import com.example.mobdev2.ui.theme.tertiaryContainerLight
 import com.ramcosta.composedestinations.annotation.Destination
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
-
-enum class TextScaleButtonType { INCREASE, DECREASE }
 
 
 @BookNavGraph
@@ -74,12 +71,11 @@ fun ReadBookSettings(
         "Georgia",
         "Inter",
         "SansSerif",
-        "Serif",
         "OpenDyslexic",
         "System Default"
     )
 
-    val selectedFont = remember { mutableStateOf(fonts[6]) }
+    val selectedFont = remember { mutableStateOf(fonts[5]) }
 
     val snackBarHostState = remember { SnackbarHostState() }
 
@@ -130,60 +126,45 @@ fun ReadBookSettings(
         ) {
 
             SampleCard(selectedFont = selectedFont)
-//            Text(
-//                text = "Text size",
-//                modifier = Modifier.padding(20.dp),
-//                fontSize = 20.sp,
-//
-//                fontStyle = MaterialTheme.typography.headlineMedium.fontStyle
-//            )
-
-//            TextScaleControls(
-//                snackBarHostState = snackBarHostState
-//            )
-
-            Text(
-                text = "Change Font",
-                modifier = Modifier.padding(20.dp),
-                fontSize = 20.sp,
-                fontStyle = MaterialTheme.typography.headlineMedium.fontStyle
-            )
             FontChooser(selectedFont = selectedFont, fonts = fonts)
         }
     }
 }
-
 @Composable
-private fun SampleCard(selectedFont: MutableState<String>) {
-    var textSize by remember { mutableStateOf(14.sp) }
+private fun SampleCard(
+    selectedFont: MutableState<String>,
+//    viewModel: ReadBookViewModel
+) {
+    var textSize by remember { mutableStateOf(14f) }
     var cardBackgroundColor by remember { mutableStateOf(Color.White) }
     var iconImage by remember { mutableStateOf(Icons.Outlined.LightMode) }
     var textColor by remember { mutableStateOf(Color.Black) }
-    val openDyslexic = FontFamily(Font(resId = R.font.open_dyslexic_regular))
-    val times = FontFamily(Font(resId = R.font.times))
+    val increaseFontSize: () -> Unit = { textSize = (textSize + 2).coerceAtMost(32f) }
+    val decreaseFontSize: () -> Unit = { textSize = (textSize - 2).coerceAtLeast(8f) }
+
     val fontMap = mapOf(
-        "Times New Roman" to times,
-        "Georgia" to georgia,
-        "SansSerif" to sanSerif,
-        "Serif" to serif,
-        "OpenDyslexic" to openDyslexic,
-        "System Default" to FontFamily.Default
+        "Times New Roman" to ReaderFont.Times,
+        "Georgia" to ReaderFont.Georgia,
+        "SansSerif" to ReaderFont.Sans,
+        "OpenDyslexic" to ReaderFont.OpenDyslexic,
+        "System Default" to ReaderFont.System
 
     )
+
     Log.d("font", fontMap.toString())
     Log.d("selectedFont", selectedFont.value)
-    val fontfam = fontMap[selectedFont.value] ?: FontFamily.Default
+    val selectedReaderFont = fontMap[selectedFont.value] ?: ReaderFont.System
+    val fontfam = selectedReaderFont.fontFamily
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
         colors = CardDefaults.elevatedCardColors(
             containerColor = cardBackgroundColor,
-            contentColor = MaterialTheme.colorScheme.onSurface,
-
             ),
         modifier = Modifier
             .fillMaxWidth()
+            .height(250.dp)
     ) {
         Text(
             text = "Aa",
@@ -197,12 +178,17 @@ private fun SampleCard(selectedFont: MutableState<String>) {
             modifier = Modifier
                 .padding(16.dp),
             textAlign = TextAlign.Justify,
-            fontSize = textSize,
-            fontFamily = fontfam,
+            style = TextStyle(
+                fontSize = textSize.sp,
+                fontFamily = fontfam,
+                color = textColor
+            )
         )
     }
     Row(
-        modifier = Modifier.padding(10.dp).fillMaxWidth(),
+        modifier = Modifier
+            .padding(10.dp)
+            .fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
     ) {
         Button(
@@ -241,7 +227,8 @@ private fun SampleCard(selectedFont: MutableState<String>) {
         Button(
             modifier = Modifier.padding(10.dp),
             onClick = {
-
+                decreaseFontSize()
+//                viewModel.decreaseFontSize()
             }) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_reader_text_minus),
@@ -252,133 +239,44 @@ private fun SampleCard(selectedFont: MutableState<String>) {
         Button(
             modifier = Modifier.padding(10.dp),
             onClick = {
-
+                increaseFontSize()
+//                viewModel.increaseFontSize()
             }) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_reader_text_plus),
                 contentDescription = "bigger font size"
             )
         }
+
     }
 }
-
-
-//@Composable
-//private fun TextScaleControls(
-////    viewModel: ReaderViewModel,
-//    snackBarHostState: SnackbarHostState
-//) {
-//    Row(
-//        modifier = Modifier.fillMaxWidth(),
-//        horizontalArrangement = Arrangement.Center
-//    ) {
-//        ReaderTextScaleButton(
-//            buttonType = TextScaleButtonType.DECREASE,
-////            fontSize = viewModel.state.fontSize,
-//            fontSize = 18,
-//            snackBarHostState = snackBarHostState,
-//            onFontSizeChanged = {}
-//        )
-//
-//        Spacer(modifier = Modifier.width(14.dp))
-//
-//        Box(
-//            modifier = Modifier
-//                .size(100.dp, 45.dp)
-//                .clip(RoundedCornerShape(16.dp))
-//                .background(ButtonDefaults.filledTonalButtonColors().containerColor),
-//            contentAlignment = Alignment.Center
-//        ) {
-//            Text(
-//                text = "100",
-//
-//                fontSize = 20.sp,
-//                color = MaterialTheme.colorScheme.onSurface,
-//                modifier = Modifier.padding(start = 2.dp, top = 2.dp)
-//            )
-//        }
-//
-//        Spacer(modifier = Modifier.width(14.dp))
-//
-//        ReaderTextScaleButton(
-//            buttonType = TextScaleButtonType.INCREASE,
-////            fontSize = viewModel.state.fontSize,
-//            fontSize = 18,
-//            snackBarHostState = snackBarHostState,
-//            onFontSizeChanged = {}
-//        )
-//    }
-//}
-//
-//@Composable
-//private fun ReaderTextScaleButton(
-//    buttonType: TextScaleButtonType,
-//    fontSize: Int,
-//    snackBarHostState: SnackbarHostState,
-//    onFontSizeChanged: (newValue: Int) -> Unit
-//) {
-//    val coroutineScope = rememberCoroutineScope()
-//
-//    val context = LocalContext.current
-//    val (iconRes, adjustment) = remember(buttonType) {
-//        when (buttonType) {
-//            TextScaleButtonType.DECREASE -> Pair(R.drawable.ic_reader_text_minus, -10)
-//            TextScaleButtonType.INCREASE -> Pair(R.drawable.ic_reader_text_plus, 10)
-//        }
-//    }
-//
-//    val callback: () -> Unit = {
-//        val newSize = fontSize + adjustment
-//        when {
-//            newSize < 50 -> {
-//                coroutineScope.launch {
-//                    snackBarHostState.showSnackbar(
-//                        context.getString(R.string.reader_min_font_size_reached),
-//                        null
-//                    )
-//                }
-//            }
-//
-//            newSize > 200 -> {
-//                coroutineScope.launch {
-//                    snackBarHostState.showSnackbar(
-//                        context.getString(R.string.reader_max_font_size_reached),
-//                        null
-//                    )
-//                }
-//            }
-//
-//            else -> {
-//                coroutineScope.launch {
-//                    val adjustedSize = fontSize + adjustment
-//                    onFontSizeChanged(adjustedSize)
-//                }
-//            }
-//        }
-//    }
-//
-//    FilledTonalButton(
-//        onClick = { callback() },
-//        modifier = Modifier.size(80.dp, 45.dp),
-//        shape = RoundedCornerShape(18.dp),
-//    ) {
-//        Icon(
-//            imageVector = ImageVector.vectorResource(id = iconRes),
-//            contentDescription = null,
-//            modifier = Modifier.size(22.dp)
-//        )
-//    }
-//}
 
 
 @Composable
 private fun FontChooser(
     selectedFont : MutableState<String>,
-    fonts: List<String>
+    fonts: List<String>,
 ) {
     var expanded by remember { mutableStateOf(false) }
-    Box(modifier = Modifier.wrapContentSize().padding(10.dp)) {
-        Text(selectedFont.value, modifier = Modifier.clickable(onClick = { expanded = true }))
+    Text(
+        text = "Change font",
+        modifier = Modifier.padding(10.dp),
+        fontStyle = MaterialTheme.typography.labelMedium.fontStyle
+        )
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .padding(10.dp)
+        .background(
+            color = MaterialTheme.colorScheme.surface,
+        )) {
+        Text(
+            selectedFont.value,
+            modifier = Modifier.clickable(onClick = { expanded = true }).background(
+                color = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(4.dp),
+            ),
+            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight(400)),
+            )
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             fonts.forEach { font ->
                 DropdownMenuItem(

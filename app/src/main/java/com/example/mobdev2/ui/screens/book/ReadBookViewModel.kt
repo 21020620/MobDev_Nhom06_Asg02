@@ -15,6 +15,11 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -43,23 +48,16 @@ sealed class ReaderFont(val id: String, val name: String, val fontFamily: FontFa
     data object System : ReaderFont("system", "System Default", FontFamily.Default)
 
     @Keep
-    data object Serif : ReaderFont("serif", "Serif", FontFamily.Serif)
+    data object Georgia : ReaderFont("cursive", "Cursive", FontFamily(Font(R.font.georgia)))
+    @Keep
+    data object OpenDyslexic :
+        ReaderFont("openDyslexic", "OpenDyslexic", FontFamily(Font(R.font.open_dyslexic_regular)))
 
     @Keep
-    data object Cursive : ReaderFont("cursive", "Cursive", FontFamily.Cursive)
+    data object Times : ReaderFont("times", "Times New Roman", FontFamily(Font(R.font.times)))
 
     @Keep
-    data object SansSerif : ReaderFont("sans-serif", "SansSerif", FontFamily.SansSerif)
-
-//    @Keep
-//    data object Inter : ReaderFont("inter", "Inter", FontFamily(Font(R.font.reader_inter_font)))
-//
-//    @Keep
-//    data object Dyslexic :
-//        ReaderFont("dyslexic", "OpenDyslexic", FontFamily(Font(R.font.reader_inter_font)))
-
-//    @Keep
-//    data object Lora : ReaderFont("figerona", "Figerona", figeronaFont)
+    data object Sans : ReaderFont("sans", "SansSerif", FontFamily(Font(R.font.sans)))
 }
 
 data class ReaderScreenState(
@@ -77,15 +75,47 @@ data class ChaptersScreenState(
     val readerData: ReaderData? = null
 )
 
+data class UserPreferences(
+    val fontFamily: String,
+    val fontSize: Int
+)
+
+private const val USER_PREFERENCES_NAME = "user_preferences"
+
+//private val Context.dataStore by dataStore(
+//    fileName = "user_preferences",
+//    serializer = MyCustomSerializer,
+//)
+class UserPreferencesRepository(
+    private val context: DataStore<Preferences>
+) {
+//    private val dataStore = context.dataStore
+//    private val FONT_KEY = stringPreferencesKey("font")
+//    private val FONT_SIZE_KEY = intPreferencesKey("font_size")
+//
+//    suspend fun saveFontSize(fontSize: Int) {
+//        dataStore.edit { preferences ->
+//            preferences[FONT_SIZE_KEY] = fontSize
+//        }
+//    }
+//
+//    suspend fun saveFontFamily(fontFamily: String) {
+//        dataStore.edit { preferences ->
+//            preferences[FONT_KEY] = fontFamily
+//        }
+//    }
+}
+
 @KoinViewModel
 class ReadBookViewModel(
-    private val bookRepo:BookRepository,
-    private val readerDataRepo:ReaderDataRepository,
-    private val savedStateHandle: SavedStateHandle
-): ViewModel() {
+    private val bookRepo: BookRepository,
+    private val readerDataRepo: ReaderDataRepository,
+    private val savedStateHandle: SavedStateHandle,
+//    private val userPreferencesRepository: UserPreferencesRepository
+) : ViewModel() {
     var state by mutableStateOf(
         ReaderScreenState(
-            fontFamily = ReaderFont.Cursive,
+            fontFamily = ReaderFont.System,
             fontSize = 14
         )
     )
@@ -105,8 +135,38 @@ class ReadBookViewModel(
 
     val selectionState = savedStateHandle.getStateFlow("selectionState", 0)
     val startIdx = savedStateHandle.getStateFlow("startIdx", 0)
-    val content = savedStateHandle.getStateFlow("content", AnnotatedString("This is a test sentence for highlighting function of the app. Extra words to make sentence longer. Make this text highlight. Longer text for better visualization"))
+    val content = savedStateHandle.getStateFlow(
+        "content",
+        AnnotatedString("This is a test sentence for highlighting function of the app. Extra words to make sentence longer. Make this text highlight. Longer text for better visualization")
+    )
     val selectionStateString = savedStateHandle.getStateFlow("selectionStateString", "")
+//    private val FONT_KEY = stringPreferencesKey("font")
+//    private val FONT_SIZE_KEY = intPreferencesKey("font_size")
+
+
+//    fun setFontFamily(fontFamily: ReaderFont) {
+//        state = state.copy(fontFamily = fontFamily)
+//        viewModelScope.launch {
+//            userPreferencesRepository.saveFontFamily(fontFamily.name)
+//        }
+//    }
+//
+//    fun increaseFontSize() {
+//        val newFontSize = state.fontSize + 2
+//        state = state.copy(fontSize = newFontSize)
+//        viewModelScope.launch {
+//            userPreferencesRepository.saveFontSize(newFontSize)
+//        }
+//    }
+//
+//    fun decreaseFontSize() {
+//        val newFontSize = state.fontSize - 2
+//        state = state.copy(fontSize = newFontSize)
+//        viewModelScope.launch {
+//            userPreferencesRepository.saveFontSize(newFontSize)
+//        }
+//    }
+
     fun addHighlight(endIdx: Int) {
         savedStateHandle["content"] = buildAnnotatedString {
             append(content.value)
@@ -216,9 +276,5 @@ class ReadBookViewModel(
             // Calculate the scroll percentage based on the visible portion
             ((1f - visiblePortion / firstVisibleItem.size.toFloat())).coerceIn(0f, 1f)
         }
-    }
-
-    fun setFontFamily(fontFamily: ReaderFont) {
-        state = state.copy(fontFamily = fontFamily)
     }
 }
