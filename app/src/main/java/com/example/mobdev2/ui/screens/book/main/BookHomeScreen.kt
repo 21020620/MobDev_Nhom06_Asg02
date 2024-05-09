@@ -50,6 +50,11 @@ fun BookHomeScreen(
             viewModel.navigateToLogin()
         }
     }
+
+    LaunchedEffect(Unit) {
+        viewModel.setCurrentUser()
+    }
+
     Scaffold(
         bottomBar = {
             val navBackStackEntry = navController.currentBackStackEntryAsState()

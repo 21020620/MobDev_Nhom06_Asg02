@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -21,10 +22,14 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,46 +40,72 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mobdev2.CachingResults
 import com.example.mobdev2.R
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.screens.destinations.BookDetailScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import org.koin.androidx.compose.koinViewModel
 
 @BookNavGraph
 @Destination
 @Composable
 fun LibraryScreen(
-    navigator: DestinationsNavigator
+    navigator: DestinationsNavigator,
+    viewModel: LibraryScreenViewModel = koinViewModel()
 ) {
-    LazyColumn {
-        item {
-            LibraryCard(
-                title = "De Men Phieu Luu Ky",
-                author = "To Hoai",
-                fileSize = "30MB",
-                date = "2024-25-04",
-                isExternalBook = true,
-                onReadClick = { /*TODO*/
-                    navigator.navigate(BookDetailScreenDestination(bookID = "Z7sXjKwP6XL46c2CNW54"))
-                }
-            ) {
 
-            }
+    val libraryList = viewModel.libraryList.collectAsState()
+
+    Scaffold(
+        topBar = {
+            TopAppBar(title = {
+                Text(
+                    text = "Library",
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(bottom = 2.dp),
+                    fontSize = 22.sp,
+                    fontFamily = figeronaFont,
+                    fontStyle = MaterialTheme.typography.headlineMedium.fontStyle
+                )
+            },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
+                    titleContentColor = MaterialTheme.colorScheme.onBackground,
+                ))
         }
-        item {
-            LibraryCard(
-                title = "Doraemon",
-                author = "Fujiko Fujio",
-                fileSize = "150KB",
-                date = "2024-10-04",
-                isExternalBook = false,
-                onReadClick = { /*TODO*/ }
-            ) {
-
+    ) { padding ->
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
+            CachingResults.bookList.filter {
+                libraryList.value.contains(it.id)
+            }.map {
+                item(
+                    key = it.id
+                ) {
+                    LibraryCard(
+                        title = it.title,
+                        author = it.author,
+                        fileSize = "30MB",
+                        date = "2024-09-05",
+                        isExternalBook = true,
+                        onReadClick = {
+                            navigator.navigate(BookDetailScreenDestination(bookID = it.id))
+                        },
+                        onDeleteClick = {
+                            viewModel.deleteFromLibrary(it.id)
+                        }
+                    )
+                }
             }
         }
     }
+
 }
 
 @Composable
