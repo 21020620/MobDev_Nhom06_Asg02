@@ -37,7 +37,6 @@ import com.example.mobdev2.ui.components.book.BookDetailTopUI
 import com.example.mobdev2.ui.components.simpleVerticalScrollbar
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.screens.destinations.ReadBookScreenDestination
-import com.example.mobdev2.ui.theme.figeronaFont
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
@@ -142,7 +141,7 @@ fun ChapterItem(chapterTitle: String, onClick: () -> Unit) {
                     .weight(3f)
                     .padding(start = 12.dp),
                 text = chapterTitle,
-                fontFamily = figeronaFont,
+                fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
                 color = MaterialTheme.colorScheme.onSurface,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,

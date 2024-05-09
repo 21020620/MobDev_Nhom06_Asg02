@@ -37,11 +37,10 @@ import androidx.navigation.NavController
 import com.example.mobdev2.R
 import com.example.mobdev2.ui.components.CustomTopAppBar
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
-import com.example.mobdev2.ui.theme.Black
-import com.example.mobdev2.ui.theme.Grey80
-import com.example.mobdev2.ui.theme.White
-import com.example.mobdev2.ui.theme.Yellow80
-import com.example.mobdev2.ui.theme.figeronaFont
+import com.example.mobdev2.ui.theme.errorDark
+import com.example.mobdev2.ui.theme.primaryDark
+import com.example.mobdev2.ui.theme.secondaryDark
+import com.example.mobdev2.ui.theme.tertiaryDark
 import com.ramcosta.composedestinations.annotation.Destination
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -78,7 +77,7 @@ fun ReadBookSettings(
                 text = "Background Color",
                 modifier = Modifier.padding(20.dp),
                 fontSize = 20.sp,
-                fontFamily = figeronaFont,
+
                 fontStyle = MaterialTheme.typography.headlineMedium.fontStyle
             )
             Row(
@@ -86,12 +85,12 @@ fun ReadBookSettings(
                     .padding(start = 100.dp)
                     .height(IntrinsicSize.Min)
             ) {
-                val colors = listOf(White, Black, Yellow80, Grey80)
+                val colors = listOf(primaryDark, secondaryDark, tertiaryDark, errorDark)
                 val borderColor = Color.Gray
 
                 Spacer(modifier = Modifier.padding(6.dp))
 
-                colors.forEach {color ->
+                colors.forEach { color ->
                     Button(
                         onClick = {},
                         colors = ButtonDefaults.buttonColors(color),
@@ -101,35 +100,35 @@ fun ReadBookSettings(
                             .border(BorderStroke(2.dp, borderColor)),
                         shape = RectangleShape
                     ) {}
-                    
+
                     Spacer(modifier = Modifier.padding(6.dp))
                 }
             }
-
-            Text(
-                text = "Text size",
-                modifier = Modifier.padding(20.dp),
-                fontSize = 20.sp,
-                fontFamily = figeronaFont,
-                fontStyle = MaterialTheme.typography.headlineMedium.fontStyle
-            )
-
-            TextScaleControls(
-//                viewModel = viewModel,
-                snackBarHostState = snackBarHostState
-            )
-
-            Text(
-                text = "Change FontStyle",
-                modifier = Modifier.padding(20.dp),
-                fontSize = 20.sp,
-                fontFamily = figeronaFont,
-                fontStyle = MaterialTheme.typography.headlineMedium.fontStyle
-            )
-
-            FontChooser()
-
         }
+
+        Text(
+            text = "Text size",
+            modifier = Modifier.padding(20.dp),
+            fontSize = 20.sp,
+
+            fontStyle = MaterialTheme.typography.headlineMedium.fontStyle
+        )
+
+        TextScaleControls(
+//                viewModel = viewModel,
+            snackBarHostState = snackBarHostState
+        )
+
+        Text(
+            text = "Change FontStyle",
+            modifier = Modifier.padding(20.dp),
+            fontSize = 20.sp,
+
+            fontStyle = MaterialTheme.typography.headlineMedium.fontStyle
+        )
+
+        FontChooser()
+
     }
 }
 
@@ -161,7 +160,7 @@ private fun TextScaleControls(
         ) {
             Text(
                 text = "100",
-                fontFamily = figeronaFont,
+
                 fontSize = 20.sp,
                 color = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(start = 2.dp, top = 2.dp)
@@ -244,7 +243,15 @@ private fun ReaderTextScaleButton(
 @Composable
 private fun FontChooser(
 ) {
-    val fonts = listOf("Cursive", "Figerona", "Inter", "OpenDyslexic", "SansSerif", "Serif", "System Default")
+    val fonts = listOf(
+        "Cursive",
+        "Figerona",
+        "Inter",
+        "OpenDyslexic",
+        "SansSerif",
+        "Serif",
+        "System Default"
+    )
     val radioOptions = fonts.map { it }
     val (selectedOption, onOptionSelected) = remember {
         mutableStateOf(radioOptions.first().toString())
@@ -282,7 +289,7 @@ private fun FontChooser(
                     text = text,
                     modifier = Modifier.padding(start = 16.dp),
                     color = MaterialTheme.colorScheme.onSurface,
-                    fontFamily = figeronaFont
+                    fontStyle = MaterialTheme.typography.bodyMedium.fontStyle,
                 )
             }
         }

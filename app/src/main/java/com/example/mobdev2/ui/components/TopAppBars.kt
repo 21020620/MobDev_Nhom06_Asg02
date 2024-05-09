@@ -31,7 +31,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mobdev2.R
-import com.example.mobdev2.ui.theme.pacificoFont
 
 @Composable
 fun CustomTopAppBar(headerText: String, iconRes: Int) {
@@ -49,9 +48,8 @@ fun CustomTopAppBar(headerText: String, iconRes: Int) {
         ) {
             Text(
                 text = headerText,
-                fontSize = 28.sp,
                 color = MaterialTheme.colorScheme.onBackground,
-                fontFamily = pacificoFont
+                fontStyle = MaterialTheme.typography.headlineMedium.fontStyle,
             )
             Icon(
                 imageVector = ImageVector.vectorResource(id = iconRes),
@@ -87,8 +85,6 @@ fun CustomTopAppBar(headerText: String, onBackButtonClicked: () -> Unit) {
                 modifier = Modifier.padding(bottom = 16.dp),
                 color = MaterialTheme.colorScheme.onBackground,
                 fontStyle = MaterialTheme.typography.headlineMedium.fontStyle,
-                fontFamily = pacificoFont,
-                fontSize = 24.sp
             )
             Spacer(modifier = Modifier.weight(2.35f))
         }

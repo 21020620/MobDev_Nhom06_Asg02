@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -37,9 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mobdev2.R
 import com.example.mobdev2.ui.components.auth.innerShadow
-import com.example.mobdev2.ui.screens.book.main.BookNavGraph
-import com.example.mobdev2.ui.theme.Purple20
-import com.example.mobdev2.ui.theme.Purple40
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -87,9 +85,8 @@ fun ResetPasswordScreen(
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = "Forgot password?",
-                        fontSize = 25.sp,
+                        fontStyle = MaterialTheme.typography.labelMedium.fontStyle,
                         fontWeight = FontWeight.Bold,
-                        color = Purple20
                     )
 
                     Box {
@@ -152,7 +149,7 @@ fun ResetPasswordScreen(
                         .width(140.dp)
                         .height(48.dp),
                     shape = RoundedCornerShape(40),
-                    colors = ButtonDefaults.buttonColors(containerColor = Purple40),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     onClick = { viewModel.resetPassword(email.value) }
                 ) {
                     Text(

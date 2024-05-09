@@ -65,7 +65,6 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mobdev2.R
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
-import com.example.mobdev2.ui.theme.figeronaFont
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
@@ -94,72 +93,82 @@ fun SettingsScreen(
     }
 
     Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
-                    titleContentColor = MaterialTheme.colorScheme.onBackground,
-                ),
-                title = {
-                    Text(
-                        stringResource(id = R.string.book_settings_screen),
-                        maxLines = 1,
-                        overflow = TextOverflow1.Ellipsis,
-                        modifier = Modifier.padding(bottom = 2.dp),
-                        fontSize = 22.sp,
-                        fontFamily = figeronaFont,
-                        fontStyle = MaterialTheme.typography.headlineMedium.fontStyle
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        navController?.navigateUp()
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = "Go back"
-                        )
-                    }
-                },
-                actions = {
-                    Icon(
-                        imageVector = Icons.Outlined.Settings,
-                        contentDescription = "Setting",
-                        modifier = Modifier.padding(end = 10.dp)
-                    )
-                },
-
+            topBar = {
+                CenterAlignedTopAppBar(
+                        colors =
+                                TopAppBarDefaults.topAppBarColors(
+                                        containerColor =
+                                                MaterialTheme.colorScheme.surfaceColorAtElevation(
+                                                        4.dp
+                                                ),
+                                        titleContentColor = MaterialTheme.colorScheme.onBackground,
+                                ),
+                        title = {
+                            Text(
+                                    stringResource(id = R.string.book_settings_screen),
+                                    maxLines = 1,
+                                    overflow = TextOverflow1.Ellipsis,
+                                    modifier = Modifier.padding(bottom = 2.dp),
+                                    fontSize = 22.sp,
+                                    
+                                    fontStyle = MaterialTheme.typography.headlineMedium.fontStyle
+                            )
+                        },
+                        navigationIcon = {
+                            IconButton(onClick = { navController?.navigateUp() }) {
+                                Icon(
+                                        imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
+                                        contentDescription = "Go back"
+                                )
+                            }
+                        },
+                        actions = {
+                            Icon(
+                                    imageVector = Icons.Outlined.Settings,
+                                    contentDescription = "Setting",
+                                    modifier = Modifier.padding(end = 10.dp)
+                            )
+                        },
                 )
-        },
-        snackbarHost = { SnackbarHost(snackBarHostState) },
+            },
+            snackbarHost = { SnackbarHost(snackBarHostState) },
     ) { paddingValues ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
-                .padding(paddingValues)
+                modifier =
+                        Modifier.fillMaxSize()
+                                .background(MaterialTheme.colorScheme.background)
+                                .padding(paddingValues)
         ) {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 ProfileCard()
                 HorizontalDivider()
                 Text(
-                    text = "Display",
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight(700)),
-                    modifier = Modifier.padding(top = 20.dp, start = 20.dp)
+                        text = "Display",
+                        style =
+                                MaterialTheme.typography.bodyMedium.copy(
+                                        fontWeight = FontWeight(700)
+                                ),
+                        modifier = Modifier.padding(top = 20.dp, start = 20.dp)
                 )
                 ThemeSetting()
                 HorizontalDivider()
                 Text(
-                    text = "Sound",
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight(700)),
-                    modifier = Modifier.padding(top = 20.dp, start = 20.dp)
+                        text = "Sound",
+                        style =
+                                MaterialTheme.typography.bodyMedium.copy(
+                                        fontWeight = FontWeight(700)
+                                ),
+                        modifier = Modifier.padding(top = 20.dp, start = 20.dp)
                 )
                 SoundSetting()
                 HorizontalDivider()
                 Text(
-                    text = "Notifications",
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight(700)),
-                    modifier = Modifier.padding(top = 20.dp, start = 20.dp)
+                        text = "Notifications",
+                        style =
+                                MaterialTheme.typography.bodyMedium.copy(
+                                        fontWeight = FontWeight(700)
+                                ),
+                        modifier = Modifier.padding(top = 20.dp, start = 20.dp)
                 )
                 NotificationSetting()
                 HorizontalDivider()
@@ -169,32 +178,31 @@ fun SettingsScreen(
     }
 }
 
-
 @Composable
 @Preview
 fun ProfileCard() {
     val user = FirebaseAuth.getInstance().currentUser
     Card(
-        modifier = Modifier
-            .padding(20.dp)
-            .fillMaxWidth()
-            .wrapContentHeight(),
-        shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
-        ),
+            modifier = Modifier.padding(20.dp).fillMaxWidth().wrapContentHeight(),
+            shape = MaterialTheme.shapes.large,
+            colors =
+                    CardDefaults.cardColors(
+                            containerColor =
+                                    MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
+                    ),
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+                modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
         ) {
             Image(
-                painter = painterResource(id = R.drawable.profile_picture), // Replace with your actual resource
-                contentDescription = "Profile Picture",
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(CircleShape)
+                    painter =
+                            painterResource(
+                                    id = R.drawable.profile_picture
+                            ), // Replace with your actual resource
+                    contentDescription = "Profile Picture",
+                    modifier = Modifier.size(64.dp).clip(CircleShape)
             )
             Column(modifier = Modifier.padding(start = 16.dp)) {
                 val email = user?.email ?: "No email"
@@ -206,11 +214,11 @@ fun ProfileCard() {
                 Text(text = email, style = MaterialTheme.typography.bodyLarge)
             }
             Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { /*TODO*/}) {
                 Icon(
-                    imageVector = Icons.Outlined.Edit,
-                    contentDescription = "Edit Profile",
-                    modifier = Modifier.padding(end = 5.dp)
+                        imageVector = Icons.Outlined.Edit,
+                        contentDescription = "Edit Profile",
+                        modifier = Modifier.padding(end = 5.dp)
                 )
             }
         }
@@ -222,40 +230,42 @@ fun ProfileCard() {
 fun ThemeSetting() {
     var currentTheme by remember { mutableStateOf(0) }
     Card(
-        modifier = Modifier
-            .padding(20.dp)
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .clickable {
-                // Change theme here
-            },
-        shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
-        ),
+            modifier =
+                    Modifier.padding(20.dp).fillMaxWidth().wrapContentHeight().clickable {
+                        // Change theme here
+                    },
+            shape = MaterialTheme.shapes.large,
+            colors =
+                    CardDefaults.cardColors(
+                            containerColor =
+                                    MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
+                    ),
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+                modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
         ) {
             if (currentTheme == 0) {
                 Icon(
-                    imageVector = Icons.Outlined.LightMode,
-                    contentDescription = "Change Theme",
-                    modifier = Modifier.padding(end = 10.dp)
+                        imageVector = Icons.Outlined.LightMode,
+                        contentDescription = "Change Theme",
+                        modifier = Modifier.padding(end = 10.dp)
                 )
             } else {
                 Icon(
-                    imageVector = Icons.Outlined.NightsStay,
-                    contentDescription = "Change Theme",
-                    modifier = Modifier.padding(end = 10.dp)
+                        imageVector = Icons.Outlined.NightsStay,
+                        contentDescription = "Change Theme",
+                        modifier = Modifier.padding(end = 10.dp)
                 )
             }
             Column {
                 Text(
-                    text = "Change Theme",
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight(700))
+                        text = "Change Theme",
+                        style =
+                                MaterialTheme.typography.titleLarge.copy(
+                                        fontWeight = FontWeight(700)
+                                )
                 )
             }
         }
@@ -271,53 +281,58 @@ fun SoundSetting() {
     val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC)
     var sliderPosition by remember { mutableFloatStateOf(currentVolume.toFloat() / maxVolume) }
     Card(
-        modifier = Modifier
-            .padding(20.dp)
-            .fillMaxWidth()
-            .wrapContentHeight(),
-        shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
-        ),
+            modifier = Modifier.padding(20.dp).fillMaxWidth().wrapContentHeight(),
+            shape = MaterialTheme.shapes.large,
+            colors =
+                    CardDefaults.cardColors(
+                            containerColor =
+                                    MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
+                    ),
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+                modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
         ) {
             if (sliderPosition > 0.5f) {
                 Icon(
-                    imageVector = Icons.Outlined.VolumeUp,
-                    contentDescription = "volume up",
-                    modifier = Modifier.padding(end = 10.dp)
+                        imageVector = Icons.Outlined.VolumeUp,
+                        contentDescription = "volume up",
+                        modifier = Modifier.padding(end = 10.dp)
                 )
             } else if (sliderPosition == 0f) {
                 Icon(
-                    imageVector = Icons.Outlined.VolumeMute,
-                    contentDescription = "mute",
-                    modifier = Modifier.padding(end = 10.dp)
+                        imageVector = Icons.Outlined.VolumeMute,
+                        contentDescription = "mute",
+                        modifier = Modifier.padding(end = 10.dp)
                 )
             } else {
                 Icon(
-                    imageVector = Icons.Outlined.VolumeDown,
-                    contentDescription = "volume down",
-                    modifier = Modifier.padding(end = 10.dp)
+                        imageVector = Icons.Outlined.VolumeDown,
+                        contentDescription = "volume down",
+                        modifier = Modifier.padding(end = 10.dp)
                 )
             }
 
             Column {
                 Text(
-                    text = "Audio Volume",
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight(700))
+                        text = "Audio Volume",
+                        style =
+                                MaterialTheme.typography.titleLarge.copy(
+                                        fontWeight = FontWeight(700)
+                                )
                 )
-                Slider(value = sliderPosition, onValueChange = {
-                    sliderPosition = it
-                    audioManager.setStreamVolume(
-                        AudioManager.STREAM_MUSIC,
-                        (it * maxVolume).toInt(),
-                        0
-                    )
-                })
+                Slider(
+                        value = sliderPosition,
+                        onValueChange = {
+                            sliderPosition = it
+                            audioManager.setStreamVolume(
+                                    AudioManager.STREAM_MUSIC,
+                                    (it * maxVolume).toInt(),
+                                    0
+                            )
+                        }
+                )
             }
         }
     }
@@ -328,54 +343,57 @@ fun SoundSetting() {
 fun NotificationSetting() {
     var boolean by remember { mutableStateOf(true) }
     Card(
-        modifier = Modifier
-            .padding(20.dp)
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .clickable { /* handle notification here */ },
-        shape = MaterialTheme.shapes.large,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
-        ),
+            modifier =
+                    Modifier.padding(20.dp)
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                            .clickable { /* handle notification here */},
+            shape = MaterialTheme.shapes.large,
+            colors =
+                    CardDefaults.cardColors(
+                            containerColor =
+                                    MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp),
+                    ),
     ) {
         Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+                modifier = Modifier.padding(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
         ) {
             if (boolean) {
                 Icon(
-                    imageVector = Icons.Outlined.Notifications,
-                    contentDescription = "turn on notifications",
-                    modifier = Modifier.padding(end = 10.dp)
+                        imageVector = Icons.Outlined.Notifications,
+                        contentDescription = "turn on notifications",
+                        modifier = Modifier.padding(end = 10.dp)
                 )
             } else {
                 Icon(
-                    imageVector = Icons.Outlined.NotificationsOff,
-                    contentDescription = "turn off notifications",
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                    modifier = Modifier.padding(end = 10.dp)
+                        imageVector = Icons.Outlined.NotificationsOff,
+                        contentDescription = "turn off notifications",
+                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                        modifier = Modifier.padding(end = 10.dp)
                 )
-
             }
             Column {
                 Text(
-                    text = "Notifications",
-                    style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight(700))
+                        text = "Notifications",
+                        style =
+                                MaterialTheme.typography.titleLarge.copy(
+                                        fontWeight = FontWeight(700)
+                                )
                 )
                 if (boolean) {
                     Text(
-                        text = "Turn off notifications",
-                        style = MaterialTheme.typography.bodyMedium
+                            text = "Turn off notifications",
+                            style = MaterialTheme.typography.bodyMedium
                     )
                 } else {
                     Text(
-                        text = "Turn on notifications",
-                        style = MaterialTheme.typography.bodyMedium
+                            text = "Turn on notifications",
+                            style = MaterialTheme.typography.bodyMedium
                     )
                 }
             }
-
         }
     }
 }
