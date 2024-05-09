@@ -15,7 +15,11 @@ class AllBookViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val db: FirebaseFirestore
 ): ViewModel() {
+
     val bookList = savedStateHandle.getStateFlow("bookList", CachingResults.bookList)
+    val isSearching = savedStateHandle.getStateFlow("isSearching", false)
+    val searchString = savedStateHandle.getStateFlow("searchString", "")
+    val listType = savedStateHandle.getStateFlow("listType", "All Books")
 
     suspend fun fetchBooks() {
         try {
@@ -25,12 +29,26 @@ class AllBookViewModel(
                     .await()
 
                 CachingResults.bookList = snapshot.documents.map {
-                    it.toObject<Book>()!!
+                    val book = it.toObject<Book>()!!
+                    book.copy(id = it.id)
                 }
             }
             savedStateHandle["bookList"] = CachingResults.bookList
         } catch (e: Exception) {
             Log.d("FETCH DATA FAILURE", "$e")
         }
+    }
+
+    fun updateSearchString(input: String) {
+        savedStateHandle["searchString"] = input
+    }
+
+    fun updateSearchState() {
+        savedStateHandle["isSearching"] = !isSearching.value
+    }
+
+    fun updateListType() {
+        if(listType.value == "All Books") savedStateHandle["listType"] = "Recommended for you"
+        else savedStateHandle["listType"] = "All Books"
     }
 }

@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.androidKsp)
     alias(libs.plugins.googleServices)
+    alias(libs.plugins.kotlinParcelize)
 }
 
 android {
@@ -59,10 +60,7 @@ android {
 
 dependencies {
 
-    implementation ("androidx.compose.runtime:runtime-livedata:1.6.1")
     implementation(libs.play.services.auth)
-    debugImplementation("androidx.compose.ui:ui-tooling:1.6.1")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.6.1")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -73,7 +71,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.core)
     implementation(libs.androidx.material.icons.extended)
-
+    implementation(libs.kotlin.reflect)
 
     implementation (libs.coil.compose)
 
@@ -89,8 +87,6 @@ dependencies {
     implementation(libs.koin.annotations)
     implementation(libs.koin.androidx.compose)
     ksp(libs.koin.compiler)
-
-    implementation ("com.google.code.gson:gson:2.10.1")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

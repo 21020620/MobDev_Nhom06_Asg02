@@ -20,6 +20,7 @@ import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -27,6 +28,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -35,6 +40,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.mobdev2.CachingResults
 import com.example.mobdev2.R
 import com.example.mobdev2.ui.components.CustomButton
 import com.example.mobdev2.ui.components.book.BookDetailTopUI
@@ -58,14 +64,23 @@ fun BookDetailScreen(
 ) {
 
     val book = viewModel.book
+    var added by remember {
+        mutableStateOf(CachingResults.currentUser.library.contains(bookID))
+    }
 
     LaunchedEffect(key1 = bookID) {
         viewModel.getBookDetails(bookID)
     }
     Scaffold(
-        topBar = { BookDetailTopBar(onBackClicked = {
-            navController?.navigateUp()
-        }, onAdd2LibClicked = { }) },
+        topBar = {
+            BookDetailTopBar(
+                onBackClicked = { navController?.navigateUp() },
+                onAdd2LibClicked = {
+                    viewModel.addBookToLib(bookID)
+                    added = true
+                                   },
+                bookAdded = added
+            ) },
         bottomBar = { BookDetailBottomBar(
             onForumClicked = { },
             onChapterClicked = {
@@ -123,7 +138,9 @@ fun BookDetailScreen(
 
 @Composable
 fun BookDetailTopBar(
-    onBackClicked: () -> Unit, onAdd2LibClicked: () -> Unit
+    onBackClicked: () -> Unit,
+    onAdd2LibClicked: () -> Unit,
+    bookAdded: Boolean
 ) {
     Row(
         modifier = Modifier
@@ -163,7 +180,7 @@ fun BookDetailTopBar(
             .background(MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp))
             .clickable { onAdd2LibClicked() }) {
             Icon(
-                imageVector = Icons.Outlined.Add,
+                imageVector = if(!bookAdded) Icons.Outlined.Add else Icons.Outlined.Check,
                 contentDescription = "Add book to lib",
                 tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(5.dp)
