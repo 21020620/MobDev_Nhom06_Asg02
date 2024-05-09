@@ -86,9 +86,9 @@ private const val USER_PREFERENCES_NAME = "user_preferences"
 //    fileName = "user_preferences",
 //    serializer = MyCustomSerializer,
 //)
-class UserPreferencesRepository(
-    private val context: DataStore<Preferences>
-) {
+//class UserPreferencesRepository(
+//    private val context: DataStore<Preferences>
+//) {
 //    private val dataStore = context.dataStore
 //    private val FONT_KEY = stringPreferencesKey("font")
 //    private val FONT_SIZE_KEY = intPreferencesKey("font_size")
@@ -104,7 +104,7 @@ class UserPreferencesRepository(
 //            preferences[FONT_KEY] = fontFamily
 //        }
 //    }
-}
+//}
 
 @KoinViewModel
 class ReadBookViewModel(

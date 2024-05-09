@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.androidKsp)
     alias(libs.plugins.googleServices)
-    alias(libs.plugins.kotlinParcelize)
+    id("kotlin-parcelize")
 }
 
 android {
@@ -62,6 +62,8 @@ dependencies {
 
     implementation(libs.play.services.auth)
 
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -73,7 +75,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.core)
     implementation(libs.androidx.material.icons.extended)
-    implementation(libs.kotlin.reflect)
+//    implementation(libs.kotlin.reflect)
 
     implementation (libs.coil.compose)
 
