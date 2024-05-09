@@ -118,7 +118,6 @@ fun AllBookScreen(
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.padding(bottom = 2.dp),
                             fontSize = 22.sp,
-                            fontFamily = figeronaFont,
                             fontStyle = MaterialTheme.typography.headlineMedium.fontStyle
                         )
 
