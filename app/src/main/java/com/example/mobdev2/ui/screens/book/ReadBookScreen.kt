@@ -109,6 +109,7 @@ fun ReadBookScreen(
         if (currentChapterIndex > 0) {
             coroutineScope.launch {
                 viewModel.setVisibleChapterIndex(currentChapterIndex - 1)
+                viewModel.setChapterScrollPercent(0f)
                 lazyListState.scrollToItem(currentChapterIndex - 1)
             }
         }
@@ -120,6 +121,7 @@ fun ReadBookScreen(
         if (currentChapterIndex < totalChapters - 1) {
             coroutineScope.launch {
                 viewModel.setVisibleChapterIndex(currentChapterIndex + 1)
+                viewModel.setChapterScrollPercent(0f)
                 lazyListState.scrollToItem(currentChapterIndex + 1)
             }
         }
@@ -157,7 +159,7 @@ fun ReadBookScreen(
 
                 // update the reading progress into the database.
                 viewModel.updateReaderProgress(
-                    bookId = "Z7sXjKwP6XL46c2CNW54",
+                    bookId = bookID,
                     chapterIndex = visibleChapterIdx,
                     chapterOffset = visibleChapterOffset
                 )
@@ -167,8 +169,8 @@ fun ReadBookScreen(
     }
 
     val snackBarHostState = remember { SnackbarHostState() }
-    val currentChapter =
-        viewModel.state.book?.chapters?.getOrNull(viewModel.visibleChapterIndex.value)
+
+    var currentChapter = viewModel.state.book?.chapters?.getOrNull(viewModel.visibleChapterIndex.value)?.name
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val chapters = viewModel.state.book?.chapters
@@ -213,6 +215,8 @@ fun ReadBookScreen(
                                     coroutineScope.launch {
                                         drawerState.close()
                                         lazyListState.scrollToItem(idx)
+                                        viewModel.setVisibleChapterIndex(idx)
+                                        viewModel.setChapterScrollPercent(0f)
                                     }
                                 }
                             )
@@ -269,18 +273,19 @@ fun ReadBookScreen(
                                     }
                                 }
                             )
+
                             Column(
                                 modifier = Modifier
                                     .padding(bottom = 8.dp)
                                     .padding(horizontal = 16.dp),
                             ) {
-                                currentChapter?.name?.let {
+                                currentChapter?.let {
                                     Text(
                                         text = it,
                                         maxLines = 2,
                                         overflow = TextOverflow.Ellipsis,
                                         color = MaterialTheme.colorScheme.onSurface,
-                                        
+
                                         fontWeight = FontWeight.Medium
                                     )
                                 }

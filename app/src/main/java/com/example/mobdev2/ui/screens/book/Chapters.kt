@@ -52,7 +52,7 @@ fun Chapters (
 ) {
 
     LaunchedEffect(key1 = true) {
-        viewModel.loadReaderData("Z7sXjKwP6XL46c2CNW54")
+        viewModel.loadReaderData(bookData.title)
     }
     val readerItem = viewModel.chaptersState.readerData
 
@@ -67,7 +67,7 @@ fun Chapters (
             ExtendedFloatingActionButton(
                 text = { Text(text = if (readerItem != null) "Resume" else "Start") },
                 onClick = {
-                          navigator.navigate(ReadBookScreenDestination(bookID = "Z7sXjKwP6XL46c2CNW54"))
+                          navigator.navigate(ReadBookScreenDestination(bookID = bookData.title))
                 },
                 icon = {
                     Icon(
@@ -109,8 +109,8 @@ fun Chapters (
             ) {
                 items(bookData.chapters.size) { idx ->
                     ChapterItem(chapterTitle = bookData.chapters[idx].name, onClick = {
-                        viewModel.updateReaderProgress("Z7sXjKwP6XL46c2CNW54", idx, 0 )
-                        navigator.navigate(ReadBookScreenDestination(bookID = "Z7sXjKwP6XL46c2CNW54"))
+                        viewModel.updateReaderProgress(bookData.title, idx, 0 )
+                        navigator.navigate(ReadBookScreenDestination(bookID = bookData.title))
                     })
                 }
             }

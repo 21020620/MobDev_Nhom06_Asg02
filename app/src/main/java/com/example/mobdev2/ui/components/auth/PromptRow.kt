@@ -33,7 +33,7 @@ fun PromptRow(
     ) {
         Text(
             text = normalText,
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 

@@ -37,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -88,7 +89,7 @@ fun BookDetailScreen(
                 }
             },
             onStartReadingClicked = {
-                navigator.navigate(ReadBookScreenDestination(bookID = "Z7sXjKwP6XL46c2CNW54"))
+                navigator.navigate(ReadBookScreenDestination(bookID = bookID))
             }
         ) },
 
@@ -127,6 +128,7 @@ fun BookDetailScreen(
                             modifier = Modifier.padding(14.dp),
                             fontStyle = MaterialTheme.typography.bodyMedium.fontStyle,
                             fontWeight = FontWeight.Medium,
+                            textAlign = TextAlign.Justify,
                             color = MaterialTheme.colorScheme.onBackground,
                         )
                     }
