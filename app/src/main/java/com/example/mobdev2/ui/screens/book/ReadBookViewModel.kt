@@ -33,7 +33,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
-
+import kotlin.math.max
+import kotlin.math.min
 @Keep
 sealed class ReaderFont(val id: String, val name: String, val fontFamily: FontFamily) {
 
@@ -173,8 +174,10 @@ class ReadBookViewModel(
     fun addHighlight(endIdx: Int) {
         savedStateHandle["content"] = buildAnnotatedString {
             append(content.value)
-            addStyle(SpanStyle(color = Color.Magenta), startIdx.value, endIdx)
-            addStyle(SpanStyle(background = Color.Yellow), startIdx.value, endIdx)
+            val leftIdx = min(startIdx.value, endIdx)
+            val rightIdx = max(startIdx.value, endIdx)
+            addStyle(SpanStyle(color = Color.Magenta), leftIdx, rightIdx)
+            addStyle(SpanStyle(background = Color.Yellow), leftIdx, rightIdx)
         }
         savedStateHandle["selectionState"] = 0
         savedStateHandle["selectionStateString"] = ""
