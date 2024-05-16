@@ -45,6 +45,7 @@ import androidx.navigation.NavController
 import com.example.mobdev2.CachingResults
 import com.example.mobdev2.R
 import com.example.mobdev2.ui.components.CustomButton
+import com.example.mobdev2.ui.components.ProgressDots
 import com.example.mobdev2.ui.components.book.BookDetailTopUI
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.screens.destinations.ChaptersDestination
@@ -98,45 +99,57 @@ fun BookDetailScreen(
 
         content = { paddingValues ->
 
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .background(MaterialTheme.colorScheme.background)
-            ) {
-                Column(
-                    Modifier
+            if (viewModel.isLoading) {
+                Box(
+                    modifier = Modifier
                         .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.background)
-                        .verticalScroll(rememberScrollState())
+                        .padding(bottom = 65.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    book?.let {
-                        BookDetailTopUI(
-                            title = it.title,
-                            authors = it.author,
-                            imageData = it.imageURL,
-                        )
+                    ProgressDots()
+                }
+            } else {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .background(MaterialTheme.colorScheme.background)
+                ) {
+                    Column(
+                        Modifier
+                            .fillMaxSize()
+                            .background(MaterialTheme.colorScheme.background)
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        book?.let {
+                            BookDetailTopUI(
+                                title = it.title,
+                                authors = it.author,
+                                imageData = it.imageURL,
+                            )
 
-                        Text(
-                            text = "Synopsis",
-                            fontSize = 20.sp,
-                            fontStyle = MaterialTheme.typography.bodyMedium.fontStyle,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onBackground,
-                            modifier = Modifier.padding(start = 12.dp, end = 8.dp),
-                        )
+                            Text(
+                                text = "Synopsis",
+                                fontSize = 20.sp,
+                                fontStyle = MaterialTheme.typography.bodyMedium.fontStyle,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onBackground,
+                                modifier = Modifier.padding(start = 12.dp, end = 8.dp),
+                            )
 
-                        Text(
-                            text = it.synopsis,
-                            modifier = Modifier.padding(14.dp),
-                            fontStyle = MaterialTheme.typography.bodyMedium.fontStyle,
-                            fontWeight = FontWeight.Medium,
-                            textAlign = TextAlign.Justify,
-                            color = MaterialTheme.colorScheme.onBackground,
-                        )
+                            Text(
+                                text = it.synopsis,
+                                modifier = Modifier.padding(14.dp),
+                                fontStyle = MaterialTheme.typography.bodyMedium.fontStyle,
+                                fontWeight = FontWeight.Medium,
+                                textAlign = TextAlign.Justify,
+                                color = MaterialTheme.colorScheme.onBackground,
+                            )
+                        }
                     }
                 }
             }
+
         })
 }
 

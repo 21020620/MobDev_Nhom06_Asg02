@@ -33,6 +33,8 @@ class ReaderReviewsModel(
     private val _rating = mutableDoubleStateOf(0.0)
     val rating: State<Double> = _rating
 
+    var isLoading by mutableStateOf<Boolean>(true)
+
 
     fun loadReviews(bookID: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -43,6 +45,7 @@ class ReaderReviewsModel(
                     review.copy(replies = replies)
                 }
                 updateRating()
+                isLoading = false
             } catch (e: Exception) {
                 Log.e("FETCH DATA FAILURE", "$e")
             }

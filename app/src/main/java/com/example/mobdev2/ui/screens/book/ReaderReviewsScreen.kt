@@ -3,6 +3,7 @@ package com.example.mobdev2.ui.screens.book
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -46,6 +47,7 @@ import coil.compose.rememberImagePainter
 import com.example.mobdev2.repo.model.Reply
 import com.example.mobdev2.repo.model.Review
 import com.example.mobdev2.ui.components.CustomTopAppBar
+import com.example.mobdev2.ui.components.ProgressDots
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.ramcosta.composedestinations.annotation.Destination
 import org.koin.androidx.compose.koinViewModel
@@ -91,49 +93,62 @@ fun ReaderReviewsScreen(
             )
         },
         content = {paddingValues ->
-            Column (
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-                    .background(MaterialTheme.colorScheme.background)
-            ) {
 
-                Text(
-                    text = String.format("%.1f", rating),
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-
-                Row(
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    verticalAlignment = Alignment.CenterVertically
+            if (viewModel.isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = 65.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    repeat(5) { index ->
-                        Icon(
-                            imageVector = if (index < rating.roundToInt()) Icons.Filled.Star else Icons.Filled.StarBorder,
-                            contentDescription = "Rating Star $index",
-                            tint = if (index < rating) MaterialTheme.colorScheme.secondary else Color.Gray
-                        )
-                    }
+                    ProgressDots()
                 }
+            } else {
+                Column (
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                        .background(MaterialTheme.colorScheme.background)
+                ) {
 
-                Text(
-                    text = "${viewModel.reviews.size} reviews",
-                    style = MaterialTheme.typography.bodySmall,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
+                    Text(
+                        text = String.format("%.1f", rating),
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
+
+                    Row(
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        repeat(5) { index ->
+                            Icon(
+                                imageVector = if (index < rating.roundToInt()) Icons.Filled.Star else Icons.Filled.StarBorder,
+                                contentDescription = "Rating Star $index",
+                                tint = if (index < rating) MaterialTheme.colorScheme.secondary else Color.Gray
+                            )
+                        }
+                    }
+
+                    Text(
+                        text = "${viewModel.reviews.size} reviews",
+                        style = MaterialTheme.typography.bodySmall,
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                    )
 
 //                HorizontalDivider(
 //                    thickness = 2.dp,
 //                    color = MaterialTheme.colorScheme.surfaceColorAtElevation(4.dp)
 //                )
 
-                LazyColumn {
-                    items(viewModel.reviews) { review ->
-                        ReviewItem(viewModel, review, bookID)
+                    LazyColumn {
+                        items(viewModel.reviews) { review ->
+                            ReviewItem(viewModel, review, bookID)
+                        }
                     }
                 }
             }
+
             if (showDialog) {
                 AlertDialog(
                     onDismissRequest = { showDialog = false },
