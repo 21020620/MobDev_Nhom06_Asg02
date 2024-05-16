@@ -27,7 +27,7 @@ class ReaderReviewsModel(
     var reviews by mutableStateOf(listOf<Review>())
 
     private val email = FirebaseAuth.getInstance().currentUser?.email
-    private val userID = email?.indexOf('@')?.let { email?.substring(0, it) }
+    private val userID = email?.indexOf('@')?.let { email.substring(0, it) }
 
 
     private val _rating = mutableDoubleStateOf(0.0)
@@ -52,12 +52,28 @@ class ReaderReviewsModel(
         }
     }
 
+    fun loadReview(bookID: String, reviewID: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val updatedReview = reviewRepo.getReviewData(bookID, reviewID)
+                val updatedReplies = reviewRepo.getRepliesData(bookID, reviewID) ?: listOf()
+                val newReview = updatedReview?.copy(replies = updatedReplies)
+                reviews = reviews.map { review ->
+                    if (review.reviewID == reviewID) newReview ?: review else review
+                }
+                updateRating()
+            } catch (e: Exception) {
+                Log.e("FETCH DATA FAILURE", "$e")
+            }
+        }
+    }
+
     fun replyReview(bookID: String, reviewID: Int, content: String) {
         viewModelScope.launch(Dispatchers.IO) {
             if (userID != null) {
                 val reply = Reply(reviewID + 100, userID, content, 0)
                 reviewRepo.addReplyData(bookID, reply, reviewID)
-                loadReviews(bookID)
+                loadReview(bookID, reviewID)
             }
         }
     }
@@ -81,21 +97,17 @@ class ReaderReviewsModel(
         _rating.doubleValue =  totalRating.toDouble() / reviews.size
     }
 
-
-    fun updateLikesCount(bookID: String, likesCount: Int, id: Int, isReply: Boolean) {
+    fun updateLikesCount(bookID: String, likesCount: Int, reviewID: Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (isReply) {
-                // Update likes count for a reply
-                reviews.forEach { review ->
-                    review.replies.find { it.replyID == id }?.let { reply ->
-                        reviewRepo.updateReplyLikes(bookID, review.reviewID, id, likesCount)
-                    }
+            reviewRepo.updateReviewLikes(bookID, reviewID, likesCount)
+            val updatedReviews = reviews.map { review ->
+                if (review.reviewID == reviewID) {
+                    review.copy(likesCount = likesCount)
+                } else {
+                    review
                 }
-            } else {
-                // Update likes count for a review
-                reviewRepo.updateReviewLikes(bookID, id, likesCount)
             }
-            loadReviews(bookID)
+            reviews = updatedReviews
         }
     }
 }

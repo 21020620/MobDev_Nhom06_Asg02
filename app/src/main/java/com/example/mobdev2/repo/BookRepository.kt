@@ -107,6 +107,17 @@ class ReviewRepository(private val db: FirebaseFirestore) {
         }
     }
 
+    suspend fun getReviewData(bookID: String, reviewID: Int): Review? {
+        val documentPath = "books/${bookID}/reviews/${reviewID}"
+        return try {
+            val snapshot = db.document(documentPath).get().await()
+            snapshot.toObject(Review::class.java)?.copy(reviewID = reviewID)
+        } catch (e: Exception) {
+            Log.e("ERROR FETCHING REVIEW DATA", "$e")
+            null
+        }
+    }
+
     suspend fun updateReviewLikes(bookID: String, reviewID: Int, likesCount: Int) {
         val reviewRef = db.collection("books").document(bookID).collection("reviews").document(reviewID.toString())
         reviewRef.update("likesCount", likesCount).await()

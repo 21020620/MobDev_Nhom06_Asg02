@@ -111,8 +111,9 @@ fun ReaderReviewsScreen(
                         .background(MaterialTheme.colorScheme.background)
                 ) {
 
+                    val safeRating = rating.takeIf { !it.isNaN() } ?: 0.0
                     Text(
-                        text = String.format("%.1f", rating),
+                        text = String.format("%.1f", safeRating),
                         style = MaterialTheme.typography.headlineSmall,
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )
@@ -121,9 +122,10 @@ fun ReaderReviewsScreen(
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        val safeRating = rating.takeIf { !it.isNaN() } ?: 0.0
                         repeat(5) { index ->
                             Icon(
-                                imageVector = if (index < rating.roundToInt()) Icons.Filled.Star else Icons.Filled.StarBorder,
+                                imageVector = if (index < safeRating.roundToInt()) Icons.Filled.Star else Icons.Filled.StarBorder,
                                 contentDescription = "Rating Star $index",
                                 tint = if (index < rating) MaterialTheme.colorScheme.secondary else Color.Gray
                             )
@@ -202,7 +204,7 @@ fun ReviewItem(viewModel: ReaderReviewsModel, review: Review, bookID: String, mo
     var showReplyDialog by remember { mutableStateOf(false) }
     var replyText by remember { mutableStateOf("") }
 
-    Column(modifier = modifier.padding(start = 10.dp, top = 8.dp)) {
+    Column(modifier = modifier.padding(start = 20.dp, top = 10.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.Top
@@ -237,11 +239,11 @@ fun ReviewItem(viewModel: ReaderReviewsModel, review: Review, bookID: String, mo
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Row {
-                    TextButton(onClick = { viewModel.updateLikesCount(bookID, review.likesCount + 1, review.reviewID, false) }) {
+                    TextButton(onClick = { viewModel.updateLikesCount(bookID, review.likesCount + 1, review.reviewID) }) {
                         Text("Like (${review.likesCount})")
                     }
                     TextButton(onClick = { showReplyDialog = true }) {
-                        Text("Reply (${review.repliesCount})")
+                        Text("Reply")
                     }
                 }
 
@@ -249,11 +251,11 @@ fun ReviewItem(viewModel: ReaderReviewsModel, review: Review, bookID: String, mo
                 if (review.replies.isNotEmpty()) {
                     if (showAllReplies) {
                         review.replies.forEach { reply ->
-                            ReplyItem(viewModel, bookID, reply, modifier = Modifier.padding(start = 10.dp))
+                            ReplyItem(viewModel, bookID, reply, modifier = Modifier.padding(start = 20.dp))
                         }
                     } else {
                         review.replies.take(2).forEach { reply ->
-                            ReplyItem(viewModel, bookID, reply, modifier = Modifier.padding(start = 10.dp))
+                            ReplyItem(viewModel, bookID, reply, modifier = Modifier.padding(start = 20.dp))
                         }
                         if (review.replies.size > 2) {
                             TextButton(onClick = { showAllReplies = true }) {
@@ -308,7 +310,7 @@ fun ReviewItem(viewModel: ReaderReviewsModel, review: Review, bookID: String, mo
 
 @Composable
 fun ReplyItem(viewModel: ReaderReviewsModel, bookID: String, reply: Reply, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.padding(start = 10.dp, top = 8.dp)) {
+    Column(modifier = modifier.padding(start = 15.dp, top = 10.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.Top
@@ -317,7 +319,7 @@ fun ReplyItem(viewModel: ReaderReviewsModel, bookID: String, reply: Reply, modif
                 painter = rememberImagePainter(data = "https://cellphones.com.vn/sforum/wp-content/uploads/2024/02/avatar-anh-meo-cute-54.jpg"),
                 contentDescription = "User Avatar",
                 modifier = Modifier
-                    .size(30.dp)
+                    .size(35.dp)
                     .clip(CircleShape)
                     .border(1.dp, MaterialTheme.colorScheme.secondary, CircleShape)
             )
@@ -333,9 +335,9 @@ fun ReplyItem(viewModel: ReaderReviewsModel, bookID: String, reply: Reply, modif
                     text = reply.content,
                     style = MaterialTheme.typography.bodySmall
                 )
-                TextButton(onClick = { viewModel.updateLikesCount(bookID, reply.likesCount + 1, reply.replyID, true) }) {
-                    Text("Like (${reply.likesCount})")
-                }
+//                TextButton(onClick = { viewModel.updateLikesCount(bookID, reply.likesCount + 1, reply.replyID, true) }) {
+//                    Text("Like (${reply.likesCount})")
+//                }
             }
         }
     }
