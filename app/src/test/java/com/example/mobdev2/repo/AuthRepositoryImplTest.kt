@@ -35,7 +35,7 @@ class AuthRepositoryImplTest {
     }
 
     @Test
-    fun test_EmailDifference_false() {
+    fun test_PasswordDifference_false() {
         val actual = instance.checkInputEmailPassword(
             "duc@gmail.com",
             "123456",
