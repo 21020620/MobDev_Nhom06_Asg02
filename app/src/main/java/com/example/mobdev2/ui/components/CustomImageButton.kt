@@ -65,7 +65,7 @@ fun CustomImageButton(
                         .align(Alignment.Center)
                         .padding(MaterialTheme.spacing.default),
                     painter = painterResource(id = imageID),
-                    contentDescription = ""
+                    contentDescription = "Genre Image"
                 )
             }
             Text(
