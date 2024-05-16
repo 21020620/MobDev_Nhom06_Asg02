@@ -15,4 +15,5 @@
     <string name="reader_max_font_size_reached">\nSorry, cannot go any higher than that!</string>
     <string name="sample_text">Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</string>
     <string name="reader_setting">Themes &amp; Settings</string>
+    <string name="avt_reviews_url">https://cellphones.com.vn/sforum/wp-content/uploads/2024/02/avatar-anh-meo-cute-54.jpg</string>
 </resources>

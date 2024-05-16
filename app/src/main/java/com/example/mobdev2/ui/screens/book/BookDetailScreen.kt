@@ -49,6 +49,7 @@ import com.example.mobdev2.ui.components.book.BookDetailTopUI
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.screens.destinations.ChaptersDestination
 import com.example.mobdev2.ui.screens.destinations.ReadBookScreenDestination
+import com.example.mobdev2.ui.screens.destinations.ReaderReviewsScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import org.koin.androidx.compose.koinViewModel
@@ -82,7 +83,9 @@ fun BookDetailScreen(
                 bookAdded = added
             ) },
         bottomBar = { BookDetailBottomBar(
-            onForumClicked = { },
+            onForumClicked = {
+                    navigator.navigate(ReaderReviewsScreenDestination(bookID))
+            },
             onChapterClicked = {
                 book?.let {
                     navigator.navigate(ChaptersDestination(bookData = it))
