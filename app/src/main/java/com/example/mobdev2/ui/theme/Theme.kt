@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -263,7 +264,7 @@ object ThemeState {
 }
 @Composable
 fun MobDev2Theme(
-    darkTheme: MutableState<Boolean> = ThemeState.darkModeState,
+    darkTheme: State<Boolean> = ThemeState.darkModeState,
 //     Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable() () -> Unit

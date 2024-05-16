@@ -41,7 +41,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -49,6 +48,7 @@ import com.example.mobdev2.R
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.theme.tertiaryContainerLight
 import com.ramcosta.composedestinations.annotation.Destination
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -73,11 +73,38 @@ fun ReadBookSettings(
     val currentBackground = MaterialTheme.colorScheme.background
     val currentTextColor = MaterialTheme.colorScheme.onBackground
 
-    var textSize by remember { mutableStateOf(14f) }
-    var backgroundColor by remember { mutableStateOf(currentBackground) }
-    var textColor by remember { mutableStateOf(currentTextColor) }
+    val settingDataStore = UserPreferences(LocalContext.current)
+    val coroutineScope = rememberCoroutineScope()
 
-    val selectedFont = remember { mutableStateOf(fonts[5]) }
+    val textSize = remember { mutableStateOf(14f) }
+    LaunchedEffect(Unit) {
+        textSize.value = settingDataStore.fontSizeFlow.first()
+    }
+    val backgroundColorStr by settingDataStore.backgroundFlow.collectAsState(initial = "")
+    val textColorStr by settingDataStore.textColorFlow.collectAsState(initial = "")
+    val fontStr by settingDataStore.fontFlow.collectAsState(initial = "")
+
+    val textColor = remember { mutableStateOf(currentTextColor) }
+    textColor.value = if (textColorStr == "light") {
+        lightColorScheme().onBackground
+    } else {
+        darkColorScheme().onBackground
+    }
+
+    val backgroundColor = remember { mutableStateOf(currentBackground) }
+    backgroundColor.value = when(backgroundColorStr) {
+        "light" -> lightColorScheme().background
+        "dark" -> darkColorScheme().background
+        "tertiary" -> tertiaryContainerLight
+        else -> currentBackground
+    }
+    Log.d("backgroundColorStr", "$backgroundColor")
+
+
+
+    val selectedFont = remember { mutableStateOf(fontStr) }
+    selectedFont.value = fontStr
+    Log.d("fontStr", "$selectedFont")
 
     val snackBarHostState = remember { SnackbarHostState() }
 
@@ -128,12 +155,11 @@ fun ReadBookSettings(
         ) {
             SampleCard(
                 selectedFont = selectedFont,
-                textSize = remember { mutableStateOf(textSize) },
-                textColor = remember { mutableStateOf(textColor) },
-                cardBackgroundColor = remember { mutableStateOf(backgroundColor) })
+                textSize = textSize,
+                textColor = textColor,
+                cardBackgroundColor = backgroundColor)
             FontChooser(selectedFont = selectedFont, fonts = fonts)
-            Log.d("background", backgroundColor.toString())
-            Log.d("textColor", textColor.toString())
+
         }
     }
 
@@ -146,8 +172,6 @@ fun SampleCard(
     textSize: MutableState<Float>,
     textColor: MutableState<Color>,
     cardBackgroundColor: MutableState<Color>,
-
-//    viewModel: ReadBookViewModel
 ) {
     var iconImage by remember { mutableStateOf(Icons.Outlined.LightMode) }
     val increaseFontSize: () -> Unit = { textSize.value = (textSize.value + 2).coerceAtMost(32f) }
@@ -161,8 +185,6 @@ fun SampleCard(
         "System Default" to ReaderFont.System
 
     )
-//    Log.d("font", fontMap.toString())
-//    Log.d("selectedFont", selectedFont.value)
 
     val selectedReaderFont = fontMap[selectedFont.value] ?: ReaderFont.System
     val fontfam = selectedReaderFont.fontFamily
@@ -175,11 +197,13 @@ fun SampleCard(
     settingDataStore = UserPreferences(localContext)
     val courotineScope = rememberCoroutineScope()
 
+    Log.d("cardBackgroundColor Card", cardBackgroundColor.value.toString())
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
         colors = CardDefaults.elevatedCardColors(
+
             containerColor = cardBackgroundColor.value,
         ),
         modifier = Modifier
@@ -230,25 +254,26 @@ fun SampleCard(
                     tertiaryContainerLight -> darkBackground
                     else -> lightBackground
                 }
-
+                Log.d("cardBackgroundColor", cardBackgroundColor.value.toString())
 
                 textColor.value = if (cardBackgroundColor.value == darkBackground) {
                     darkText
                 } else {
                     lightText
                 }
+                Log.d("textColor", textColor.value.toString())
                 courotineScope.launch {
                     if (cardBackgroundColor.value == lightBackground) {
-                        settingDataStore.saveBackground("light", localContext)
+                        settingDataStore.saveBackground("light")
                     } else if (cardBackgroundColor.value == darkBackground) {
-                        settingDataStore.saveBackground("dark", localContext)
+                        settingDataStore.saveBackground("dark")
                     } else {
-                        settingDataStore.saveBackground("tertiary", localContext)
+                        settingDataStore.saveBackground("tertiary")
                     }
                     if (textColor.value == lightText) {
-                        settingDataStore.saveTextColor("light", localContext)
+                        settingDataStore.saveTextColor("light")
                     } else {
-                        settingDataStore.saveTextColor("dark", localContext)
+                        settingDataStore.saveTextColor("dark")
                     }
                 }
             }) {
@@ -263,7 +288,7 @@ fun SampleCard(
             onClick = {
                 decreaseFontSize()
             courotineScope.launch {
-                settingDataStore.saveFontSize(textSize.value, localContext)
+                settingDataStore.saveFontSize(textSize.value)
             }
             }) {
             Icon(
@@ -276,7 +301,9 @@ fun SampleCard(
             modifier = Modifier.padding(10.dp),
             onClick = {
                 increaseFontSize()
-//                viewModel.increaseFontSize()
+                courotineScope.launch {
+                    settingDataStore.saveFontSize(textSize.value)
+                }
             }) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_reader_text_plus),
@@ -298,6 +325,7 @@ private fun FontChooser(
     settingDataStore = UserPreferences(localContext)
     val courotineScope = rememberCoroutineScope()
     var expanded by remember { mutableStateOf(false) }
+
     Text(
         text = "Change font",
         modifier = Modifier.padding(10.dp),
@@ -329,18 +357,11 @@ private fun FontChooser(
                         selectedFont.value = font
                         expanded = false
                         courotineScope.launch {
-                            settingDataStore.saveFont(font, localContext)
+                            settingDataStore.saveFont(font)
                         }
                     })
             }
         }
     }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun ReadBookSettingsPV() {
-    ReadBookSettings()
 }
 

@@ -287,8 +287,7 @@ fun ReadBookScreen(
                                         maxLines = 2,
                                         overflow = TextOverflow.Ellipsis,
                                         color = MaterialTheme.colorScheme.onSurface,
-
-                                        fontWeight = FontWeight.Medium
+                                        fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
                                     )
                                 }
                             }

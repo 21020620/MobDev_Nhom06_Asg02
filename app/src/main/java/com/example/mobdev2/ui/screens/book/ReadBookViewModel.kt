@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.annotation.Keep
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -82,6 +83,7 @@ class ReadBookViewModel(
     private val savedStateHandle: SavedStateHandle,
     private val settingDataStore: UserPreferences
 ) : ViewModel() {
+
     var state by mutableStateOf(
         ReaderScreenState(
             fontFamily = ReaderFont.System,
@@ -90,7 +92,6 @@ class ReadBookViewModel(
             textColor = "current"
         )
     )
-
     init {
         viewModelScope.launch {
             settingDataStore.fontFlow.collect { font ->
@@ -99,21 +100,22 @@ class ReadBookViewModel(
                 } else {
                     ReaderFont.System
                 }
-
-
                 state = state.copy(fontFamily = readerFont)
-
             }
             settingDataStore.fontSizeFlow.collect { fontSize ->
-
-                state = state.copy(fontSize = fontSize?.toFloat() ?: 14f)
-                Log.d("ReadBookViewModel", "fontSize: $fontSize")
+                Log.d("FONTSIZE","$fontSize")
+                state = state.copy(fontSize = fontSize)
+                Log.d("FONTSIZE","${state.fontSize}")
             }
-            settingDataStore.backgroundFlow.collect { background ->
-                state = state.copy(background = background ?: "current")
+            settingDataStore.backgroundFlow.collect { bg ->
+                Log.d("BACKGROUND", "$bg")
+                state = state.copy(background = bg)
+                Log.d("BackgroundAfter", "${state.background}")
             }
             settingDataStore.textColorFlow.collect { textColor ->
-                state = state.copy(textColor = textColor ?: "current")
+                Log.d("TEXTCOLOR", "$textColor")
+                state = state.copy(textColor = textColor)
+                Log.d("TextColorAfter", "${state.textColor}")
             }
         }
     }

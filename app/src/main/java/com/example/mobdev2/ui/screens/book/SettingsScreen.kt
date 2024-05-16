@@ -48,6 +48,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -230,6 +231,7 @@ fun ProfileCard() {
 fun ThemeSetting(
     viewModel: SettingsScreenViewModel
 ) {
+
     var currentTheme by remember { mutableStateOf(0) }
     Card(
             modifier =

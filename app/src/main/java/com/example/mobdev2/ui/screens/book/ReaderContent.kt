@@ -1,5 +1,6 @@
 package com.example.mobdev2.ui.screens.book
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -14,13 +15,18 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mobdev2.repo.model.Chapter
+import com.example.mobdev2.ui.theme.tertiaryContainerLight
 import kotlinx.coroutines.CoroutineScope
 
 
@@ -66,7 +72,22 @@ private fun ChapterLazyItemItem(
     onClick: () -> Unit
 ) {
     val paragraphs = remember { chunkText(chapter.content) }
-
+    val background = when(state.background){
+        "light" -> lightColorScheme().background
+        "dark" -> darkColorScheme().background
+        "tertiary" -> tertiaryContainerLight
+        else -> MaterialTheme.colorScheme.background
+    }
+    val textColor = when(state.textColor){
+        "dark" -> darkColorScheme().onBackground
+        "light" -> lightColorScheme().onBackground
+        else -> MaterialTheme.colorScheme.onBackground
+    }
+    LaunchedEffect(state) {
+        Log.d("FONT SIZE IN SCREEN", "${state.fontSize}")
+        Log.d("BACKGROUND IN SCREEN", "$background")
+        Log.d("TEXT COLOR IN SCREEN", "$textColor")
+    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -75,7 +96,7 @@ private fun ChapterLazyItemItem(
         Text(
             modifier = Modifier.padding(start = 12.dp, end = 4.dp, top = 10.dp),
             text = chapter.name,
-            fontStyle = MaterialTheme.typography.displaySmall.fontStyle,
+            fontStyle = MaterialTheme.typography.displayMedium.fontStyle,
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.88f)
         )
         Spacer(modifier = Modifier.height(12.dp))
@@ -86,12 +107,12 @@ private fun ChapterLazyItemItem(
                 style = LocalTextStyle.current.copy(
                     fontSize = state.fontSize.sp,
                     fontFamily = state.fontFamily.fontFamily,
-
+                    color = textColor,
+                    background = background
                 ),
                 textAlign = TextAlign.Justify,
                 modifier = Modifier.padding(start = 14.dp, end = 14.dp, bottom = 8.dp),
             )
-
         }
 
         HorizontalDivider(
