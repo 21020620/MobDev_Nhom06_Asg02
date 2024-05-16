@@ -65,8 +65,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.media.AudioAttributes
+import android.media.MediaPlayer
+import androidx.compose.material.icons.filled.PauseCircle
+import androidx.compose.runtime.collectAsState
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.screens.destinations.ReadBookSettingsDestination
+import com.google.firebase.Firebase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.storage
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
@@ -96,6 +103,7 @@ fun ReadBookScreen(
     val lazyListState = rememberLazyListState()
 
     var isBookLoaded by remember { mutableStateOf(false) }
+    val isPlayingAudio = viewModel.isPlayingAudio.collectAsState()
 
 
     val scrollToPosition = { index: Int, offset: Int ->
@@ -142,6 +150,10 @@ fun ReadBookScreen(
         }
 
 
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.getAudioFile()
     }
 
     LaunchedEffect(lazyListState, isBookLoaded) {
@@ -314,7 +326,7 @@ fun ReadBookScreen(
                         onSettingsClick = {
                             navigator.navigate(ReadBookSettingsDestination)
                         },
-                        onPlayStopAudioClick = { /*TODO*/ },
+                        onPlayStopAudioClick = { viewModel.toggleAudio() },
                         onMenuClick = { coroutineScope.launch { drawerState.open() } },
                         onNavigateNextClick = { navigateToNextChapter() }
                     )
@@ -353,6 +365,7 @@ fun BottomBar(
     onMenuClick: () -> Unit,
     onNavigateNextClick: () -> Unit
 ) {
+    val isPlayingAudio = remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -376,9 +389,13 @@ fun BottomBar(
             )
         }
 
-        IconButton(onClick = { onPlayStopAudioClick() }, modifier = Modifier.weight(1f)) {
+        IconButton(onClick = {
+            onPlayStopAudioClick()
+            isPlayingAudio.value = !isPlayingAudio.value
+                             }, modifier = Modifier.weight(1f)) {
             Icon(
-                Icons.Filled.PlayCircleOutline, null,
+                imageVector = if(!isPlayingAudio.value) Icons.Filled.PlayCircleOutline else Icons.Filled.PauseCircle,
+                contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(30.dp)
             )

@@ -1,7 +1,11 @@
 package com.example.mobdev2.ui.screens.book
 
+import android.content.Context
+import android.media.MediaPlayer
+import android.os.Build
 import android.util.Log
 import androidx.annotation.Keep
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -24,6 +28,7 @@ import com.example.mobdev2.repo.ReaderDataRepository
 import com.example.mobdev2.repo.model.Book
 import com.example.mobdev2.repo.model.ReaderData
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -127,6 +132,10 @@ class ReadBookViewModel(
     private val email = FirebaseAuth.getInstance().currentUser?.email
     private val userID = email?.indexOf('@')?.let { email?.substring(0, it) }
 
+    val isPlayingAudio = savedStateHandle.getStateFlow("isPlayingAudio", false)
+    val audioUrl = savedStateHandle.getStateFlow("audioUrl", "")
+
+    private lateinit var mediaPlayer: MediaPlayer
 
     val selectionState = savedStateHandle.getStateFlow("selectionState", 0)
     val startIdx = savedStateHandle.getStateFlow("startIdx", 0)
@@ -161,7 +170,6 @@ class ReadBookViewModel(
 //            userPreferencesRepository.saveFontSize(newFontSize)
 //        }
 //    }
-
     fun addHighlight(endIdx: Int) {
         savedStateHandle["content"] = buildAnnotatedString {
             append(content.value)
@@ -230,46 +238,77 @@ class ReadBookViewModel(
         _chapterScrolledPercent.floatValue = percent
     }
 
-    fun updateReaderProgress(bookId: String, chapterIndex: Int, chapterOffset: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (userID?.let { readerDataRepo.getReaderData(it, bookId) } != null) {
-                val updates = mapOf(
-                    "lastChapterIndex" to chapterIndex,
-                    "lastChapterOffset" to chapterOffset
-                )
-                readerDataRepo.updateReaderData(userID, bookId, updates)
-            } else {
-                userID?.let {
-                    ReaderData(bookId, chapterIndex, chapterOffset, it)
-                }?.let { readerDataRepo.saveReaderData(readerData = it) }
-            }
+    fun getAudioFile() {
+        val storageRef = FirebaseStorage.getInstance().reference
+        val fileRef = storageRef.child("synthesis.wav")
+        fileRef.downloadUrl.addOnSuccessListener { uri ->
+            savedStateHandle["audioUrl"] = uri.toString()
+        }.addOnFailureListener {
+            Log.e("AUDIO", "Failed to play audio: $it")
         }
     }
 
-    fun hideReaderInfo() {
-        state = state.copy(showReaderMenu = false)
-    }
-
-    fun calculateChapterPercentage(lazyListState: LazyListState): Float {
-        val firstVisibleItem = lazyListState.layoutInfo.visibleItemsInfo.firstOrNull() ?: return -1f
-        val listHeight =
-            lazyListState.layoutInfo.viewportEndOffset - lazyListState.layoutInfo.viewportStartOffset
-
-        // Calculate the scroll percentage for the first visible item
-        val itemTop = firstVisibleItem.offset.toFloat()
-        val itemBottom = itemTop + firstVisibleItem.size.toFloat()
-
-        return if (itemTop >= listHeight || itemBottom <= 0f) {
-            1f // Item is completely scrolled out of view
+    fun toggleAudio() {
+        if (isPlayingAudio.value) {
+            savedStateHandle["isPlayingAudio"] = false
+            mediaPlayer.stop()
+            mediaPlayer.release()
         } else {
-            // Calculate the visible portion of the item
-            val visiblePortion = if (itemTop < 0f) {
-                itemBottom
-            } else {
-                listHeight - itemTop
+            savedStateHandle["isPlayingAudio"] = true
+            mediaPlayer = MediaPlayer().apply {
+                setDataSource(audioUrl.value)
+                prepare()
+                start()
             }
-            // Calculate the scroll percentage based on the visible portion
-            ((1f - visiblePortion / firstVisibleItem.size.toFloat())).coerceIn(0f, 1f)
         }
     }
+
+
+        fun updateReaderProgress(bookId: String, chapterIndex: Int, chapterOffset: Int) {
+            viewModelScope.launch(Dispatchers.IO) {
+                if (userID?.let { readerDataRepo.getReaderData(it, bookId) } != null) {
+                    val updates = mapOf(
+                        "lastChapterIndex" to chapterIndex,
+                        "lastChapterOffset" to chapterOffset
+                    )
+                    readerDataRepo.updateReaderData(userID, bookId, updates)
+                } else {
+                    userID?.let {
+                        ReaderData(bookId, chapterIndex, chapterOffset, it)
+                    }?.let { readerDataRepo.saveReaderData(readerData = it) }
+                }
+            }
+        }
+
+        fun hideReaderInfo() {
+            state = state.copy(showReaderMenu = false)
+        }
+
+        fun startPlayingAudio() {
+            savedStateHandle["isPlayingAudio"] = true
+        }
+
+        fun calculateChapterPercentage(lazyListState: LazyListState): Float {
+            val firstVisibleItem =
+                lazyListState.layoutInfo.visibleItemsInfo.firstOrNull() ?: return -1f
+            val listHeight =
+                lazyListState.layoutInfo.viewportEndOffset - lazyListState.layoutInfo.viewportStartOffset
+
+            // Calculate the scroll percentage for the first visible item
+            val itemTop = firstVisibleItem.offset.toFloat()
+            val itemBottom = itemTop + firstVisibleItem.size.toFloat()
+
+            return if (itemTop >= listHeight || itemBottom <= 0f) {
+                1f // Item is completely scrolled out of view
+            } else {
+                // Calculate the visible portion of the item
+                val visiblePortion = if (itemTop < 0f) {
+                    itemBottom
+                } else {
+                    listHeight - itemTop
+                }
+                // Calculate the scroll percentage based on the visible portion
+                ((1f - visiblePortion / firstVisibleItem.size.toFloat())).coerceIn(0f, 1f)
+            }
+        }
 }
