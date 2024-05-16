@@ -14,13 +14,11 @@ import androidx.compose.material.icons.outlined.NightsStay
 import androidx.compose.material.icons.outlined.RemoveRedEye
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,19 +27,17 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -51,12 +47,10 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.mobdev2.R
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
-import com.example.mobdev2.ui.theme.georgia
 import com.example.mobdev2.ui.theme.tertiaryContainerLight
 import com.ramcosta.composedestinations.annotation.Destination
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-
 
 
 @BookNavGraph
@@ -64,8 +58,9 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ReadBookSettings(
     navController: NavController? = null,
-    viewModel: ReadBookViewModel = koinViewModel()
-) {
+    viewModel: ReadBookViewModel = koinViewModel(),
+
+    ) {
     val fonts = listOf(
         "Times New Roman",
         "Georgia",
@@ -74,6 +69,13 @@ fun ReadBookSettings(
         "OpenDyslexic",
         "System Default"
     )
+
+    val currentBackground = MaterialTheme.colorScheme.background
+    val currentTextColor = MaterialTheme.colorScheme.onBackground
+
+    var textSize by remember { mutableStateOf(14f) }
+    var backgroundColor by remember { mutableStateOf(currentBackground) }
+    var textColor by remember { mutableStateOf(currentTextColor) }
 
     val selectedFont = remember { mutableStateOf(fonts[5]) }
 
@@ -124,23 +126,32 @@ fun ReadBookSettings(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-
-            SampleCard(selectedFont = selectedFont)
+            SampleCard(
+                selectedFont = selectedFont,
+                textSize = remember { mutableStateOf(textSize) },
+                textColor = remember { mutableStateOf(textColor) },
+                cardBackgroundColor = remember { mutableStateOf(backgroundColor) })
             FontChooser(selectedFont = selectedFont, fonts = fonts)
+            Log.d("background", backgroundColor.toString())
+            Log.d("textColor", textColor.toString())
         }
     }
+
+
 }
+
 @Composable
-private fun SampleCard(
+fun SampleCard(
     selectedFont: MutableState<String>,
+    textSize: MutableState<Float>,
+    textColor: MutableState<Color>,
+    cardBackgroundColor: MutableState<Color>,
+
 //    viewModel: ReadBookViewModel
 ) {
-    var textSize by remember { mutableStateOf(14f) }
-    var cardBackgroundColor by remember { mutableStateOf(Color.White) }
     var iconImage by remember { mutableStateOf(Icons.Outlined.LightMode) }
-    var textColor by remember { mutableStateOf(Color.Black) }
-    val increaseFontSize: () -> Unit = { textSize = (textSize + 2).coerceAtMost(32f) }
-    val decreaseFontSize: () -> Unit = { textSize = (textSize - 2).coerceAtLeast(8f) }
+    val increaseFontSize: () -> Unit = { textSize.value = (textSize.value + 2).coerceAtMost(32f) }
+    val decreaseFontSize: () -> Unit = { textSize.value = (textSize.value - 2).coerceAtLeast(8f) }
 
     val fontMap = mapOf(
         "Times New Roman" to ReaderFont.Times,
@@ -150,18 +161,27 @@ private fun SampleCard(
         "System Default" to ReaderFont.System
 
     )
+//    Log.d("font", fontMap.toString())
+//    Log.d("selectedFont", selectedFont.value)
 
-    Log.d("font", fontMap.toString())
-    Log.d("selectedFont", selectedFont.value)
     val selectedReaderFont = fontMap[selectedFont.value] ?: ReaderFont.System
     val fontfam = selectedReaderFont.fontFamily
+    val lightBackground = remember { lightColorScheme().background }
+    val darkBackground = remember { darkColorScheme().background }
+    val lightText = remember { lightColorScheme().onBackground }
+    val darkText = remember { darkColorScheme().onBackground }
+    lateinit var settingDataStore: UserPreferences
+    val localContext = LocalContext.current
+    settingDataStore = UserPreferences(localContext)
+    val courotineScope = rememberCoroutineScope()
+
     ElevatedCard(
         elevation = CardDefaults.cardElevation(
             defaultElevation = 6.dp
         ),
         colors = CardDefaults.elevatedCardColors(
-            containerColor = cardBackgroundColor,
-            ),
+            containerColor = cardBackgroundColor.value,
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .height(250.dp)
@@ -172,6 +192,7 @@ private fun SampleCard(
                 .padding(16.dp),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.titleSmall,
+            color = textColor.value
         )
         Text(
             text = stringResource(id = R.string.sample_text),
@@ -179,9 +200,9 @@ private fun SampleCard(
                 .padding(16.dp),
             textAlign = TextAlign.Justify,
             style = TextStyle(
-                fontSize = textSize.sp,
+                fontSize = textSize.value.sp,
                 fontFamily = fontfam,
-                color = textColor
+                color = textColor.value
             )
         )
     }
@@ -202,20 +223,33 @@ private fun SampleCard(
                     Icons.Outlined.LightMode
                 }
 
-                val previousCardBackgroundColor = cardBackgroundColor
+                val previousCardBackgroundColor = cardBackgroundColor.value
 
-                cardBackgroundColor = if (previousCardBackgroundColor == Color.White) {
-                    tertiaryContainerLight
-                } else if (previousCardBackgroundColor == tertiaryContainerLight) {
-                    Color.Black
-                } else {
-                    Color.White
+                cardBackgroundColor.value = when (previousCardBackgroundColor) {
+                    lightBackground -> tertiaryContainerLight
+                    tertiaryContainerLight -> darkBackground
+                    else -> lightBackground
                 }
 
-                textColor = if (cardBackgroundColor == Color.Black) {
-                    Color.White
+
+                textColor.value = if (cardBackgroundColor.value == darkBackground) {
+                    darkText
                 } else {
-                    Color.Black
+                    lightText
+                }
+                courotineScope.launch {
+                    if (cardBackgroundColor.value == lightBackground) {
+                        settingDataStore.saveBackground("light", localContext)
+                    } else if (cardBackgroundColor.value == darkBackground) {
+                        settingDataStore.saveBackground("dark", localContext)
+                    } else {
+                        settingDataStore.saveBackground("tertiary", localContext)
+                    }
+                    if (textColor.value == lightText) {
+                        settingDataStore.saveTextColor("light", localContext)
+                    } else {
+                        settingDataStore.saveTextColor("dark", localContext)
+                    }
                 }
             }) {
             Icon(
@@ -228,7 +262,9 @@ private fun SampleCard(
             modifier = Modifier.padding(10.dp),
             onClick = {
                 decreaseFontSize()
-//                viewModel.decreaseFontSize()
+            courotineScope.launch {
+                settingDataStore.saveFontSize(textSize.value, localContext)
+            }
             }) {
             Icon(
                 imageVector = ImageVector.vectorResource(id = R.drawable.ic_reader_text_minus),
@@ -254,29 +290,37 @@ private fun SampleCard(
 
 @Composable
 private fun FontChooser(
-    selectedFont : MutableState<String>,
+    selectedFont: MutableState<String>,
     fonts: List<String>,
 ) {
+    lateinit var settingDataStore: UserPreferences
+    val localContext = LocalContext.current
+    settingDataStore = UserPreferences(localContext)
+    val courotineScope = rememberCoroutineScope()
     var expanded by remember { mutableStateOf(false) }
     Text(
         text = "Change font",
         modifier = Modifier.padding(10.dp),
-        fontStyle = MaterialTheme.typography.labelMedium.fontStyle
-        )
-    Box(modifier = Modifier
-        .fillMaxWidth()
-        .padding(10.dp)
-        .background(
-            color = MaterialTheme.colorScheme.surface,
-        )) {
+        style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight(900)),
+    )
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(10.dp)
+            .background(
+                color = MaterialTheme.colorScheme.surface,
+            )
+    ) {
         Text(
             selectedFont.value,
-            modifier = Modifier.clickable(onClick = { expanded = true }).background(
-                color = MaterialTheme.colorScheme.surface,
-                shape = RoundedCornerShape(4.dp),
-            ),
+            modifier = Modifier
+                .clickable(onClick = { expanded = true })
+                .background(
+                    color = MaterialTheme.colorScheme.surface,
+                    shape = RoundedCornerShape(4.dp),
+                ),
             style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight(400)),
-            )
+        )
         DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             fonts.forEach { font ->
                 DropdownMenuItem(
@@ -284,6 +328,9 @@ private fun FontChooser(
                     onClick = {
                         selectedFont.value = font
                         expanded = false
+                        courotineScope.launch {
+                            settingDataStore.saveFont(font, localContext)
+                        }
                     })
             }
         }

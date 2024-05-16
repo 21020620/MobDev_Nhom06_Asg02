@@ -1,5 +1,6 @@
 package com.example.mobdev2.ui.screens.book
 
+import android.content.Context
 import android.util.Log
 import androidx.annotation.Keep
 import androidx.compose.foundation.lazy.LazyListState
@@ -11,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -59,7 +61,9 @@ data class ReaderScreenState(
     val isLoading: Boolean = true,
     val showReaderMenu: Boolean = false,
     val fontFamily: ReaderFont = ReaderFont.System,
-    val fontSize: Int = 18,
+    val fontSize: Float = 14f,
+    val background: String? = "current",
+    val textColor: String? = "current",
     val book: Book? = null,
     val readerData: ReaderData? = null
 )
@@ -70,50 +74,49 @@ data class ChaptersScreenState(
     val readerData: ReaderData? = null
 )
 
-data class UserPreferences(
-    val fontFamily: String,
-    val fontSize: Int
-)
-
-private const val USER_PREFERENCES_NAME = "user_preferences"
-
-//private val Context.dataStore by dataStore(
-//    fileName = "user_preferences",
-//    serializer = MyCustomSerializer,
-//)
-//class UserPreferencesRepository(
-//    private val context: DataStore<Preferences>
-//) {
-//    private val dataStore = context.dataStore
-//    private val FONT_KEY = stringPreferencesKey("font")
-//    private val FONT_SIZE_KEY = intPreferencesKey("font_size")
-//
-//    suspend fun saveFontSize(fontSize: Int) {
-//        dataStore.edit { preferences ->
-//            preferences[FONT_SIZE_KEY] = fontSize
-//        }
-//    }
-//
-//    suspend fun saveFontFamily(fontFamily: String) {
-//        dataStore.edit { preferences ->
-//            preferences[FONT_KEY] = fontFamily
-//        }
-//    }
-//}
 
 @KoinViewModel
 class ReadBookViewModel(
     private val bookRepo: BookRepository,
     private val readerDataRepo: ReaderDataRepository,
     private val savedStateHandle: SavedStateHandle,
-//    private val userPreferencesRepository: UserPreferencesRepository
+    private val settingDataStore: UserPreferences
 ) : ViewModel() {
     var state by mutableStateOf(
         ReaderScreenState(
             fontFamily = ReaderFont.System,
-            fontSize = 14
+            fontSize = 14f,
+            background = "current",
+            textColor = "current"
         )
     )
+
+    init {
+        viewModelScope.launch {
+            settingDataStore.fontFlow.collect { font ->
+                val readerFont = if (font != null && ReaderFont.getAllFonts().any { it.name == font }) {
+                    ReaderFont.getFontByName(font)
+                } else {
+                    ReaderFont.System
+                }
+
+
+                state = state.copy(fontFamily = readerFont)
+
+            }
+            settingDataStore.fontSizeFlow.collect { fontSize ->
+
+                state = state.copy(fontSize = fontSize?.toFloat() ?: 14f)
+                Log.d("ReadBookViewModel", "fontSize: $fontSize")
+            }
+            settingDataStore.backgroundFlow.collect { background ->
+                state = state.copy(background = background ?: "current")
+            }
+            settingDataStore.textColorFlow.collect { textColor ->
+                state = state.copy(textColor = textColor ?: "current")
+            }
+        }
+    }
 
     var chaptersState by mutableStateOf(ChaptersScreenState())
 
@@ -135,32 +138,7 @@ class ReadBookViewModel(
         AnnotatedString("This is a test sentence for highlighting function of the app. Extra words to make sentence longer. Make this text highlight. Longer text for better visualization")
     )
     val selectionStateString = savedStateHandle.getStateFlow("selectionStateString", "")
-//    private val FONT_KEY = stringPreferencesKey("font")
-//    private val FONT_SIZE_KEY = intPreferencesKey("font_size")
 
-
-//    fun setFontFamily(fontFamily: ReaderFont) {
-//        state = state.copy(fontFamily = fontFamily)
-//        viewModelScope.launch {
-//            userPreferencesRepository.saveFontFamily(fontFamily.name)
-//        }
-//    }
-//
-//    fun increaseFontSize() {
-//        val newFontSize = state.fontSize + 2
-//        state = state.copy(fontSize = newFontSize)
-//        viewModelScope.launch {
-//            userPreferencesRepository.saveFontSize(newFontSize)
-//        }
-//    }
-//
-//    fun decreaseFontSize() {
-//        val newFontSize = state.fontSize - 2
-//        state = state.copy(fontSize = newFontSize)
-//        viewModelScope.launch {
-//            userPreferencesRepository.saveFontSize(newFontSize)
-//        }
-//    }
 
     fun addHighlight(endIdx: Int) {
         savedStateHandle["content"] = buildAnnotatedString {
@@ -272,4 +250,6 @@ class ReadBookViewModel(
             ((1f - visiblePortion / firstVisibleItem.size.toFloat())).coerceIn(0f, 1f)
         }
     }
+
+
 }

@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -18,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.mobdev2.repo.model.Chapter
 import kotlinx.coroutines.CoroutineScope
 
@@ -73,7 +75,7 @@ private fun ChapterLazyItemItem(
         Text(
             modifier = Modifier.padding(start = 12.dp, end = 4.dp, top = 10.dp),
             text = chapter.name,
-            fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
+            fontStyle = MaterialTheme.typography.displaySmall.fontStyle,
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.88f)
         )
         Spacer(modifier = Modifier.height(12.dp))
@@ -81,7 +83,11 @@ private fun ChapterLazyItemItem(
         paragraphs.forEach { para->
             Text(
                 text = para,
-                fontStyle = MaterialTheme.typography.bodySmall.fontStyle,
+                style = LocalTextStyle.current.copy(
+                    fontSize = state.fontSize.sp,
+                    fontFamily = state.fontFamily.fontFamily,
+
+                ),
                 textAlign = TextAlign.Justify,
                 modifier = Modifier.padding(start = 14.dp, end = 14.dp, bottom = 8.dp),
             )

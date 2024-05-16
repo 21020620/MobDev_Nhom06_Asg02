@@ -264,7 +264,7 @@ object ThemeState {
 @Composable
 fun MobDev2Theme(
     darkTheme: MutableState<Boolean> = ThemeState.darkModeState,
-    // Dynamic color is available on Android 12+
+//     Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable() () -> Unit
 ) {

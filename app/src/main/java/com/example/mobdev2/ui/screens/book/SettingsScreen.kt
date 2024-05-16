@@ -1,8 +1,5 @@
 package com.example.mobdev2.ui.screens.book
 
-import android.app.Application
-import android.content.Context
-import android.media.AudioManager
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
