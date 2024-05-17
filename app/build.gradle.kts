@@ -61,12 +61,13 @@ android {
 dependencies {
 
     implementation(libs.play.services.auth)
-
     implementation("androidx.datastore:datastore-preferences:1.0.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
     implementation(libs.androidx.lifecycle.livedata.ktx)
     testImplementation("androidx.test:core:1.4.0")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2")
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.ui.text.google.fonts)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -78,13 +79,13 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.core)
     implementation(libs.androidx.material.icons.extended)
-//    implementation(libs.kotlin.reflect)
 
     implementation (libs.coil.compose)
 
     implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)    
+    implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
 
     implementation(libs.compose.destination)
     ksp(libs.compose.destination.ksp)

@@ -69,6 +69,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material.icons.filled.PauseCircle
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.screens.destinations.ReadBookSettingsDestination
 import com.example.mobdev2.ui.theme.tertiaryContainerLight
@@ -101,6 +102,7 @@ fun ReadBookScreen(
     val lazyListState = rememberLazyListState()
 
     var isBookLoaded by remember { mutableStateOf(false) }
+    val isPlayingAudio = viewModel.isPlayingAudio.collectAsState()
 
     var settingDataStore: UserPreferences
     val localContext = LocalContext.current
@@ -160,6 +162,10 @@ fun ReadBookScreen(
         }
 
 
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.getAudioFile()
     }
 
     LaunchedEffect(lazyListState, isBookLoaded) {
@@ -336,7 +342,7 @@ fun ReadBookScreen(
                         onSettingsClick = {
                             navigator.navigate(ReadBookSettingsDestination)
                         },
-                        onPlayStopAudioClick = { /*TODO*/ },
+                        onPlayStopAudioClick = { viewModel.toggleAudio() },
                         onMenuClick = { coroutineScope.launch { drawerState.open() } },
                         onNavigateNextClick = { navigateToNextChapter() }
                     )
@@ -379,6 +385,7 @@ fun BottomBar(
     onMenuClick: () -> Unit,
     onNavigateNextClick: () -> Unit
 ) {
+    val isPlayingAudio = remember { mutableStateOf(false) }
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -402,9 +409,13 @@ fun BottomBar(
             )
         }
 
-        IconButton(onClick = { onPlayStopAudioClick() }, modifier = Modifier.weight(1f)) {
+        IconButton(onClick = {
+            onPlayStopAudioClick()
+            isPlayingAudio.value = !isPlayingAudio.value
+                             }, modifier = Modifier.weight(1f)) {
             Icon(
-                Icons.Filled.PlayCircleOutline, null,
+                imageVector = if(!isPlayingAudio.value) Icons.Filled.PlayCircleOutline else Icons.Filled.PauseCircle,
+                contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(30.dp)
             )

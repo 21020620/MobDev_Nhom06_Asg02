@@ -38,24 +38,14 @@ import org.koin.core.parameter.parametersOf
 @Destination
 @Composable
 fun PickBookGenresScreen(
+    email: String,
     navigator: DestinationsNavigator,
     viewModel: PickBookGenresViewModel = koinViewModel(parameters = {
         parametersOf(navigator)
     })
 ) {
 
-    val bookGenreList: ArrayList<BookGenre> = arrayListOf(
-        BookGenre(R.drawable.art_books, "Art Books"),
-        BookGenre(R.drawable.history_books, "History Books"),
-        BookGenre(R.drawable.biographies, "Biographies"),
-        BookGenre(R.drawable.kids_books, "Kids Books"),
-        BookGenre(R.drawable.romance, "Romance"),
-        BookGenre(R.drawable.medical_books, "Medical Books"),
-        BookGenre(R.drawable.mystery, "Mystery"),
-        BookGenre(R.drawable.science_fiction, "Science Fiction"),
-        BookGenre(R.drawable.science_books, "Science Books"),
-        BookGenre(R.drawable.fantasy, "Fantasy"),
-    )
+    val bookGenreList = viewModel.bookGenreList
 
     val pickedList = viewModel.pickedList.collectAsState()
 
@@ -125,7 +115,9 @@ fun PickBookGenresScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(45.dp),
-                    onClick = viewModel::navigateToHome,
+                    onClick = {
+                        viewModel.navigateToHome(email)
+                    },
                     text = "Continue",
                     fontSize = 20.sp,
                     shape = RoundedCornerShape(24)

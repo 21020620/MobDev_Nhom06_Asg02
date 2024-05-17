@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.mobdev2.repo.AuthRepositoryImpl
 import com.example.mobdev2.ui.screens.destinations.LoginScreenDestination
 import com.example.mobdev2.ui.screens.destinations.PickBookGenresScreenDestination
 import com.google.firebase.auth.ktx.auth
@@ -39,8 +40,11 @@ class SignUpViewModel(
 
     fun signUp() = viewModelScope.launch {
         try {
+            val inputCheck = AuthRepositoryImpl()
+            if(!inputCheck.checkInputEmailPassword(email.value, password.value, confirmPassword.value))
+                throw Exception("INVALID INPUT FOR EMAIL AND PASSWORD")
             Firebase.auth.createUserWithEmailAndPassword(email.value, password.value).await()
-            navigator.navigate(PickBookGenresScreenDestination)
+            navigator.navigate(PickBookGenresScreenDestination(email = email.value))
         } catch (e: Exception) {
             Log.d("AUTHENTICATION FAILURE", "$e")
         }

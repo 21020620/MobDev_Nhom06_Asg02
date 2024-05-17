@@ -48,7 +48,7 @@ class AllBookViewModel(
     }
 
     fun updateListType() {
-        if(listType.value == "All Books") savedStateHandle["listType"] = "Recommended for you"
+        if(listType.value == "All Books") savedStateHandle["listType"] = "Recommendations"
         else savedStateHandle["listType"] = "All Books"
     }
 }

@@ -1,13 +1,21 @@
 package com.example.mobdev2.ui.screens.book
 
+import android.util.Log
 import android.view.ContextMenu
 import android.view.MenuItem
+import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Pentagon
+import androidx.compose.material.icons.filled.Task
 import androidx.compose.material.icons.outlined.Pentagon
+import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -17,11 +25,13 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.IntOffset
@@ -43,11 +53,6 @@ fun BookForumScreen(
     val selectionState = viewModel.selectionState.collectAsState()
     val chapterName = "Chapter 4"
     val selectionStateString = viewModel.selectionStateString.collectAsState()
-    val showContextMenu = remember { mutableStateOf(false) }
-    val contextMenuPosition = remember { mutableStateOf(IntOffset.Zero) }
-    val currentOffset = remember {
-        mutableStateOf(Offset(0f, 0f))
-    }
     Scaffold(
         topBar = {
             TopAppBar(
@@ -67,58 +72,44 @@ fun BookForumScreen(
             )
         }
     ) { paddingValue ->
-        Text(
-            text = text.value,
-            onTextLayout = { layoutResult ->
-                textLayoutResult.value = layoutResult },
-            fontSize = 30.sp,
+        Box(
             modifier = Modifier
+                .fillMaxSize()
                 .padding(paddingValue)
-                .pointerInput(Unit) {
-                    detectTapGestures(
-                        onTap = { offset ->
-                            textLayoutResult.value?.let { layoutResult ->
-                                val characterOffset = layoutResult.getOffsetForPosition(offset)
-                                val wordRange = layoutResult.getWordBoundary(characterOffset)
-                                if (selectionState.value == 2)
+        ) {
+            Text(
+                text = text.value,
+                onTextLayout = { layoutResult ->
+                    textLayoutResult.value = layoutResult
+                },
+                fontSize = 30.sp,
+                modifier = Modifier
+                    .padding(paddingValue)
+                    .pointerInput(Unit) {
+                        detectDragGesturesAfterLongPress(
+                            onDragStart = { offset ->
+                                textLayoutResult.value?.let { layoutResult ->
+                                    val characterOffset = layoutResult.getOffsetForPosition(offset)
+                                    val wordRange = layoutResult.getWordBoundary(characterOffset)
+                                    viewModel.setStartIdx(wordRange.start)
                                     viewModel.addHighlight(wordRange.end)
+                                    Log.d("START INDEX", "${wordRange.start}")
+                                }
+                            },
+                            onDrag = { change, _ ->
+                                textLayoutResult.value?.let { layoutResult ->
+                                    val characterOffset = layoutResult.getOffsetForPosition(change.position)
+                                    val wordRange = layoutResult.getWordBoundary(characterOffset)
+                                    viewModel.addHighlight(wordRange.end)
+                                }
+                                change.consume()
+                            },
+                            onDragEnd = {
+                                Log.d("DRAG ENDED", "NOTHING")
                             }
-                        },
-                        onLongPress = { offset ->
-                            currentOffset.value = offset
-                            contextMenuPosition.value = offset.round()
-                            showContextMenu.value = true
-                        }
-                    )
-                }
+                        )
+                    }
             )
-
-        if (showContextMenu.value) {
-            Popup(
-                alignment = Alignment.TopStart,
-                offset = contextMenuPosition.value,
-                onDismissRequest = { showContextMenu.value = false }
-            ) {
-                DropdownMenu(
-                    expanded = showContextMenu.value,
-                    onDismissRequest = { /*TODO*/ }) {
-                    DropdownMenuItem(
-                        text = {  Text("Highlight") },
-                        onClick = {
-                            textLayoutResult.value?.let { layoutResult ->
-                                val characterOffset = layoutResult.getOffsetForPosition(currentOffset.value)
-                                val wordRange = layoutResult.getWordBoundary(characterOffset)
-                                viewModel.setStartIdx(wordRange.start)
-                                showContextMenu.value = false
-                            }
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Add comment") },
-                        onClick = {  }
-                    )
-                }
-            }
         }
     }
 }

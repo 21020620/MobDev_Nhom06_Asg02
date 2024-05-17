@@ -27,12 +27,16 @@ class BookDetailViewModel(
     init {
         book = savedStateHandle.get<Book>("book")
     }
+
+    var isLoading by mutableStateOf<Boolean>(true)
+
     fun getBookDetails(bookID: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val fetchedBook = bookRepo.getBookByID(bookID)
                 savedStateHandle["book"] = fetchedBook
                 book = fetchedBook
+                isLoading = false
             } catch (e: Exception) {
                 Log.e("FETCH DATA FAILURE", "$e")
             }
