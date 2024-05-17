@@ -19,15 +19,22 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mobdev2.repo.model.Chapter
 import com.example.mobdev2.ui.theme.tertiaryContainerLight
+import com.google.firebase.annotations.concurrent.Background
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.first
 
 
 private fun chunkText(text: String): List<String> {
@@ -41,6 +48,25 @@ fun ReaderContent(
     viewModel: ReadBookViewModel,
     lazyListState: LazyListState,
 ) {
+    var settingDataStore: UserPreferences
+    val localContext = LocalContext.current
+    settingDataStore = UserPreferences(localContext)
+    val currentTextColor = MaterialTheme.colorScheme.onBackground
+    val textSize = remember { mutableStateOf(14f) }
+    LaunchedEffect(Unit) {
+        textSize.value = settingDataStore.fontSizeFlow.first()
+    }
+    val backgroundColorStr by settingDataStore.backgroundFlow.collectAsState(initial = "")
+    val textColorStr by settingDataStore.textColorFlow.collectAsState(initial = "")
+
+    val textColor = remember { mutableStateOf(currentTextColor) }
+    textColor.value = if (textColorStr == "light") {
+        lightColorScheme().onBackground
+    } else {
+        darkColorScheme().onBackground
+    }
+
+
     SelectionContainer {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
@@ -54,6 +80,8 @@ fun ReaderContent(
                 ChapterLazyItemItem(
                     chapter = chapter,
                     state = viewModel.state,
+                    textColor = textColor.value,
+                    textSize = textSize.value,
                     onClick = {
                             viewModel.toggleReaderMenu()
                     }
@@ -69,25 +97,11 @@ fun ReaderContent(
 private fun ChapterLazyItemItem(
     chapter: Chapter,
     state: ReaderScreenState,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    textColor: Color,
+    textSize: Float
 ) {
     val paragraphs = remember { chunkText(chapter.content) }
-    val background = when(state.background){
-        "light" -> lightColorScheme().background
-        "dark" -> darkColorScheme().background
-        "tertiary" -> tertiaryContainerLight
-        else -> MaterialTheme.colorScheme.background
-    }
-    val textColor = when(state.textColor){
-        "dark" -> darkColorScheme().onBackground
-        "light" -> lightColorScheme().onBackground
-        else -> MaterialTheme.colorScheme.onBackground
-    }
-    LaunchedEffect(state) {
-        Log.d("FONT SIZE IN SCREEN", "${state.fontSize}")
-        Log.d("BACKGROUND IN SCREEN", "$background")
-        Log.d("TEXT COLOR IN SCREEN", "$textColor")
-    }
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -96,8 +110,8 @@ private fun ChapterLazyItemItem(
         Text(
             modifier = Modifier.padding(start = 12.dp, end = 4.dp, top = 10.dp),
             text = chapter.name,
-            fontStyle = MaterialTheme.typography.displayMedium.fontStyle,
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.88f)
+            fontStyle = MaterialTheme.typography.titleSmall.fontStyle,
+            color = textColor
         )
         Spacer(modifier = Modifier.height(12.dp))
 
@@ -105,10 +119,9 @@ private fun ChapterLazyItemItem(
             Text(
                 text = para,
                 style = LocalTextStyle.current.copy(
-                    fontSize = state.fontSize.sp,
+                    fontSize = textSize.sp,
                     fontFamily = state.fontFamily.fontFamily,
                     color = textColor,
-                    background = background
                 ),
                 textAlign = TextAlign.Justify,
                 modifier = Modifier.padding(start = 14.dp, end = 14.dp, bottom = 8.dp),

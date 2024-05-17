@@ -48,10 +48,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,12 +64,14 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.screens.destinations.ReadBookSettingsDestination
+import com.example.mobdev2.ui.theme.tertiaryContainerLight
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.launch
@@ -97,8 +102,19 @@ fun ReadBookScreen(
 
     var isBookLoaded by remember { mutableStateOf(false) }
 
+    var settingDataStore: UserPreferences
+    val localContext = LocalContext.current
+    settingDataStore = UserPreferences(localContext)
+    val currentBackground = MaterialTheme.colorScheme.background
+    val backgroundColorStr by settingDataStore.backgroundFlow.collectAsState(initial = "")
 
-
+    val backgroundColor = remember { mutableStateOf(currentBackground) }
+    backgroundColor.value = when (backgroundColorStr) {
+        "light" -> lightColorScheme().background
+        "dark" -> darkColorScheme().background
+        "tertiary" -> tertiaryContainerLight
+        else -> currentBackground
+    }
 
     val scrollToPosition = { index: Int, offset: Int ->
         coroutineScope.launch {
@@ -172,7 +188,8 @@ fun ReadBookScreen(
 
     val snackBarHostState = remember { SnackbarHostState() }
 
-    var currentChapter = viewModel.state.book?.chapters?.getOrNull(viewModel.visibleChapterIndex.value)?.name
+    var currentChapter =
+        viewModel.state.book?.chapters?.getOrNull(viewModel.visibleChapterIndex.value)?.name
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val chapters = viewModel.state.book?.chapters
@@ -189,7 +206,7 @@ fun ReadBookScreen(
                     modifier = Modifier.padding(start = 16.dp, top = 12.dp),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.SemiBold,
-                    
+
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
@@ -242,8 +259,12 @@ fun ReadBookScreen(
                         Column(modifier = Modifier.displayCutoutPadding()) {
                             TopAppBar(
                                 colors = TopAppBarDefaults.topAppBarColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp),
-                                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp),
+                                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
+                                        2.dp
+                                    ),
+                                    scrolledContainerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
+                                        2.dp
+                                    ),
                                 ),
                                 title = {
                                     viewModel.state.book?.let {
@@ -287,7 +308,7 @@ fun ReadBookScreen(
                                         maxLines = 2,
                                         overflow = TextOverflow.Ellipsis,
                                         color = MaterialTheme.colorScheme.onSurface,
-                                        fontStyle = MaterialTheme.typography.titleMedium.fontStyle,
+                                        fontStyle = MaterialTheme.typography.displayLarge.fontStyle,
                                     )
                                 }
                             }
@@ -336,7 +357,11 @@ fun ReadBookScreen(
                             CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                         }
                     } else {
-                        Box(modifier = Modifier.padding(paddingValues)) {
+                        Box(
+                            modifier = Modifier
+                                .padding(paddingValues)
+                                .background(backgroundColor.value)
+                        ) {
                             ReaderContent(viewModel = viewModel, lazyListState = lazyListState)
                         }
                     }

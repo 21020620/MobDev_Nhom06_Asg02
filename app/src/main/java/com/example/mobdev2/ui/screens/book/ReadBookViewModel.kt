@@ -29,6 +29,8 @@ import com.example.mobdev2.repo.model.ReaderData
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
 
@@ -63,8 +65,6 @@ data class ReaderScreenState(
     val showReaderMenu: Boolean = false,
     val fontFamily: ReaderFont = ReaderFont.System,
     val fontSize: Float = 14f,
-    val background: String? = "current",
-    val textColor: String? = "current",
     val book: Book? = null,
     val readerData: ReaderData? = null
 )
@@ -81,44 +81,37 @@ class ReadBookViewModel(
     private val bookRepo: BookRepository,
     private val readerDataRepo: ReaderDataRepository,
     private val savedStateHandle: SavedStateHandle,
-    private val settingDataStore: UserPreferences
 ) : ViewModel() {
 
     var state by mutableStateOf(
         ReaderScreenState(
             fontFamily = ReaderFont.System,
             fontSize = 14f,
-            background = "current",
-            textColor = "current"
         )
     )
-    init {
-        viewModelScope.launch {
-            settingDataStore.fontFlow.collect { font ->
-                val readerFont = if (font != null && ReaderFont.getAllFonts().any { it.name == font }) {
-                    ReaderFont.getFontByName(font)
-                } else {
-                    ReaderFont.System
-                }
-                state = state.copy(fontFamily = readerFont)
-            }
-            settingDataStore.fontSizeFlow.collect { fontSize ->
-                Log.d("FONTSIZE","$fontSize")
-                state = state.copy(fontSize = fontSize)
-                Log.d("FONTSIZE","${state.fontSize}")
-            }
-            settingDataStore.backgroundFlow.collect { bg ->
-                Log.d("BACKGROUND", "$bg")
-                state = state.copy(background = bg)
-                Log.d("BackgroundAfter", "${state.background}")
-            }
-            settingDataStore.textColorFlow.collect { textColor ->
-                Log.d("TEXTCOLOR", "$textColor")
-                state = state.copy(textColor = textColor)
-                Log.d("TextColorAfter", "${state.textColor}")
-            }
-        }
-    }
+//    init {
+//        viewModelScope.launch {
+//            settingDataStore.fontFlow.collect { font ->
+//                val readerFont = ReaderFont.getFontByName(font)
+//                state = state.copy(fontFamily = readerFont)
+//            }
+//            settingDataStore.fontSizeFlow
+//                .collect { font_size ->
+//                state = state.copy(fontSize = font_size)
+//                Log.d("FONTSIZE","${state.fontSize}")
+//            }
+//            settingDataStore.backgroundFlow.collect { bg ->
+//                Log.d("BACKGROUND", "$bg")
+//                state = state.copy(background = bg)
+//                Log.d("BackgroundAfter", "${state.background}")
+//            }
+//            settingDataStore.textColorFlow.collect { text_color ->
+//                Log.d("TEXTCOLOR", "$text_color")
+//                state = state.copy(textColor = text_color)
+//                Log.d("TextColorAfter", "${state.textColor}")
+//            }
+//        }
+//    }
 
     var chaptersState by mutableStateOf(ChaptersScreenState())
 

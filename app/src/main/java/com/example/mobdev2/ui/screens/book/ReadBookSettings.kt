@@ -74,7 +74,6 @@ fun ReadBookSettings(
     val currentTextColor = MaterialTheme.colorScheme.onBackground
 
     val settingDataStore = UserPreferences(LocalContext.current)
-    val coroutineScope = rememberCoroutineScope()
 
     val textSize = remember { mutableStateOf(14f) }
     LaunchedEffect(Unit) {
@@ -98,13 +97,11 @@ fun ReadBookSettings(
         "tertiary" -> tertiaryContainerLight
         else -> currentBackground
     }
-    Log.d("backgroundColorStr", "$backgroundColor")
 
 
 
     val selectedFont = remember { mutableStateOf(fontStr) }
     selectedFont.value = fontStr
-    Log.d("fontStr", "$selectedFont")
 
     val snackBarHostState = remember { SnackbarHostState() }
 
@@ -185,13 +182,13 @@ fun SampleCard(
         "System Default" to ReaderFont.System
 
     )
-
     val selectedReaderFont = fontMap[selectedFont.value] ?: ReaderFont.System
     val fontfam = selectedReaderFont.fontFamily
     val lightBackground = remember { lightColorScheme().background }
     val darkBackground = remember { darkColorScheme().background }
     val lightText = remember { lightColorScheme().onBackground }
     val darkText = remember { darkColorScheme().onBackground }
+
     lateinit var settingDataStore: UserPreferences
     val localContext = LocalContext.current
     settingDataStore = UserPreferences(localContext)
