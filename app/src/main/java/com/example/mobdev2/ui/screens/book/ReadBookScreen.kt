@@ -80,6 +80,8 @@ import com.example.mobdev2.ui.screens.destinations.ReadBookSettingsDestination
 import com.example.mobdev2.ui.theme.tertiaryContainerLight
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
@@ -89,6 +91,7 @@ object ReaderConstants {
 
 }
 
+@OptIn(FlowPreview::class)
 @Destination
 @BookNavGraph
 @Composable
@@ -173,26 +176,29 @@ fun ReadBookScreen(
         viewModel.getAudioFile()
     }
 
+    val updateFlow = snapshotFlow { lazyListState.firstVisibleItemScrollOffset }
+
     LaunchedEffect(lazyListState, isBookLoaded) {
+        launch {
+            if(isBookLoaded)
+                updateFlow
+                    .debounce(400)
+                    .collect { visibleChapterOffset ->
+                        val visibleChapterIdx = lazyListState.firstVisibleItemIndex
+                        viewModel.updateReaderProgress(
+                            bookId = bookID,
+                            chapterIndex = visibleChapterIdx,
+                            chapterOffset = visibleChapterOffset
+                        )
+                    }
+        }
         if (isBookLoaded) {
-            snapshotFlow {
-                lazyListState.firstVisibleItemScrollOffset
-            }.collect { visibleChapterOffset ->
-                // fetch last visible chapter position and offset.
+            updateFlow.collect { _ ->
                 val visibleChapterIdx = lazyListState.firstVisibleItemIndex
-                // Set currently visible chapter & index.
                 viewModel.setVisibleChapterIndex(visibleChapterIdx)
                 viewModel.setChapterScrollPercent(
                     viewModel.calculateChapterPercentage(lazyListState)
                 )
-
-                // update the reading progress into the database.
-                viewModel.updateReaderProgress(
-                    bookId = bookID,
-                    chapterIndex = visibleChapterIdx,
-                    chapterOffset = visibleChapterOffset
-                )
-
             }
         }
     }
