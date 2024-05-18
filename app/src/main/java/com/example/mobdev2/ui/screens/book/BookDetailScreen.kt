@@ -72,6 +72,7 @@ fun BookDetailScreen(
 
     LaunchedEffect(key1 = bookID) {
         viewModel.getBookDetails(bookID)
+        viewModel.loadHighlight(bookID)
     }
     Scaffold(
         topBar = {

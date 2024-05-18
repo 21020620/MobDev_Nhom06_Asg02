@@ -60,4 +60,28 @@ class BookDetailViewModel(
                 Log.d("UPDATE LIBRARY", "FAIL: $e")
             }
     }
+
+    fun loadHighlight(bookID: String) {
+        db.collection("users")
+            .document(CachingResults.currentUser.name)
+            .collection("books")
+            .document(bookID)
+            .get()
+            .addOnSuccessListener { document ->
+                try {
+                    val stringList = document.get("highlights") as List<String>
+                    CachingResults.highlights = stringList.map {
+                        it.split(",").map { num ->
+                            num.toInt()
+                        }
+                    }
+                    Log.d("CACHING RESULT", CachingResults.highlights.joinToString("/"))
+                } catch (e: Exception) {
+                    Log.d("HIGHLIGHT", "NO HIGHLIGHT: $e")
+                }
+            }
+            .addOnFailureListener {
+                Log.d("GET HIGHLIGHT FAILED", "$it")
+            }
+    }
 }

@@ -1,6 +1,7 @@
 [versions]
 agp = "8.3.2"
 coilCompose = "2.4.0"
+androidxTestCore = "1.4.0"
 datastorePreferences = "1.0.0"
 firebaseBom = "32.8.0"
 kotlin = "1.9.22"
@@ -8,9 +9,11 @@ coreKtx = "1.12.0"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
+kotlinxCoroutinesTest = "1.5.2"
 lifecycleRuntimeKtx = "2.7.0"
 activityCompose = "1.8.2"
 composeBom = "2024.02.00"
+lifecycleRuntimeCompose = "2.6.0"
 ksp = "1.9.22-1.0.16"
 koinAndroid = "3.5.5"
 composeDestination = "1.10.2"
@@ -19,12 +22,14 @@ googleServices = "4.4.1"
 lifecycleViewmodelCompose = "1.0.0-alpha07"
 playServicesAuth = "21.1.0"
 uiTextGoogleFonts = "1.6.7"
-lifecycleLivedataKtx = "2.8.0"
+lifecycleLivedataKtx = "2.7.0"
 
 [libraries]
+androidx-test-core = { group = "androidx.test", name = "core", version.ref = "androidxTestCore" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
+androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeCompose" }
 androidx-material-icons-core = { module = "androidx.compose.material:material-icons-core" }
 androidx-material-icons-extended = { module = "androidx.compose.material:material-icons-extended" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coilCompose" }
@@ -53,6 +58,7 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
 firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
 firebase-storage = { group = "com.google.firebase", name = "firebase-storage" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
 play-services-auth = { group = "com.google.android.gms", name = "play-services-auth", version.ref = "playServicesAuth" }
 androidx-ui-text-google-fonts = { group = "androidx.compose.ui", name = "ui-text-google-fonts", version.ref = "uiTextGoogleFonts" }
 androidx-lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }

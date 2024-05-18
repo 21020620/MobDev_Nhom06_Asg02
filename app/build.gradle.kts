@@ -3,7 +3,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.androidKsp)
     alias(libs.plugins.googleServices)
-    id("kotlin-parcelize")
+    alias(libs.plugins.kotlinParcelize)
 }
 
 android {
@@ -61,11 +61,9 @@ android {
 dependencies {
 
     implementation(libs.play.services.auth)
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
+    implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.lifecycle.livedata.ktx)
-    testImplementation("androidx.test:core:1.4.0")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.5.2")
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.ui.text.google.fonts)
@@ -79,6 +77,8 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material.icons.core)
     implementation(libs.androidx.material.icons.extended)
+
+    implementation(kotlin("reflect"))
 
     implementation (libs.coil.compose)
 
@@ -97,12 +97,14 @@ dependencies {
     ksp(libs.koin.compiler)
 
     testImplementation(libs.junit)
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.kotlinx.coroutines.test)
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-    implementation(kotlin("reflect"))
 
 }

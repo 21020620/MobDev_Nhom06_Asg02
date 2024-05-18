@@ -25,6 +25,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoFixNormal
+import androidx.compose.material.icons.filled.BookmarkRemove
+import androidx.compose.material.icons.filled.FormatPaint
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.NavigateBefore
 import androidx.compose.material.icons.filled.NavigateNext
@@ -70,6 +72,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.filled.PauseCircle
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.screens.destinations.ReadBookSettingsDestination
 import com.example.mobdev2.ui.theme.tertiaryContainerLight
@@ -124,6 +129,8 @@ fun ReadBookScreen(
         }
     }
 
+    val expandMenu = viewModel.expandMenu.collectAsStateWithLifecycle()
+
     val navigateToPreviousChapter: () -> Unit = {
         val currentChapterIndex = viewModel.visibleChapterIndex.value
         if (currentChapterIndex > 0) {
@@ -156,12 +163,10 @@ fun ReadBookScreen(
             }
             isBookLoaded = true
         })
-
+        viewModel.setBookID(bookID)
         if (viewModel.state.readerData?.lastChapterIndex != null && viewModel.state.readerData?.lastChapterIndex != ReaderConstants.DEFAULT_NONE) {
             scrollToPosition(viewModel.state.readerData?.lastChapterIndex!!, 0)
         }
-
-
     }
 
     LaunchedEffect(Unit) {
@@ -199,6 +204,7 @@ fun ReadBookScreen(
 
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val chapters = viewModel.state.book?.chapters
+
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -293,11 +299,44 @@ fun ReadBookScreen(
                                         )
                                     }
 
-                                    IconButton(onClick = { /*TODO*/ }) {
+                                    IconButton(onClick = viewModel::toggleMenu) {
                                         Icon(
                                             Icons.Filled.AutoFixNormal, null,
                                             tint = MaterialTheme.colorScheme.onSurface,
                                             modifier = Modifier.size(30.dp)
+                                        )
+                                    }
+                                    
+                                    DropdownMenu(
+                                        expanded = expandMenu.value,
+                                        onDismissRequest = viewModel::toggleMenu) {
+                                        DropdownMenuItem(
+                                            text = { Text(text = "Highlight") },
+                                            onClick = {
+                                                viewModel.changeReadingAction("Highlight")
+                                                viewModel.toggleMenu()
+                                                viewModel.toggleReaderMenu()
+                                            },
+                                            leadingIcon = {
+                                                Icon(
+                                                    imageVector = Icons.Default.FormatPaint,
+                                                    contentDescription = "Highlight"
+                                                )
+                                            }
+                                        )
+                                        DropdownMenuItem(
+                                            text = { Text(text = "Erase") },
+                                            onClick = {
+                                                viewModel.changeReadingAction("Erase")
+                                                viewModel.toggleMenu()
+                                                viewModel.toggleReaderMenu()
+                                            },
+                                            leadingIcon = {
+                                                Icon(
+                                                    imageVector = Icons.Default.BookmarkRemove,
+                                                    contentDescription = "Erase"
+                                                )
+                                            }
                                         )
                                     }
                                 }
