@@ -17,7 +17,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.example.mobdev2.TestRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -49,12 +49,21 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/LICENSE.md"
+            excludes += "/META-INF/LICENSE-notice.md"
         }
     }
     applicationVariants.all {
         addJavaSourceFoldersToModel(
             File(layout.buildDirectory.get().asFile, "generated/ksp/$name/kotlin")
         )
+    }
+    testOptions {
+        packagingOptions {
+            jniLibs {
+                useLegacyPackaging = true
+            }
+        }
     }
 }
 
@@ -102,6 +111,8 @@ dependencies {
 
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.koin.test.junit4)
+    androidTestImplementation(libs.io.mockk.android)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)

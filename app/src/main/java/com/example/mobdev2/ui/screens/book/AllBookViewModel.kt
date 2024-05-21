@@ -3,17 +3,14 @@ package com.example.mobdev2.ui.screens.book
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
-import com.example.mobdev2.repo.model.Book
 import com.example.mobdev2.CachingResults
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.toObject
-import kotlinx.coroutines.tasks.await
+import com.example.mobdev2.repo.AllBookRepo
 import org.koin.android.annotation.KoinViewModel
 
 @KoinViewModel
 class AllBookViewModel(
     private val savedStateHandle: SavedStateHandle,
-    private val db: FirebaseFirestore
+    private val allBookRepo: AllBookRepo
 ): ViewModel() {
 
     val bookList = savedStateHandle.getStateFlow("bookList", CachingResults.bookList)
@@ -24,14 +21,7 @@ class AllBookViewModel(
     suspend fun fetchBooks() {
         try {
             if(CachingResults.bookList.isEmpty()) {
-                val snapshot = db.collection("books")
-                    .get()
-                    .await()
-
-                CachingResults.bookList = snapshot.documents.map {
-                    val book = it.toObject<Book>()!!
-                    book.copy(id = it.id)
-                }
+                CachingResults.bookList = allBookRepo.getAllBooks()
             }
             savedStateHandle["bookList"] = CachingResults.bookList
         } catch (e: Exception) {

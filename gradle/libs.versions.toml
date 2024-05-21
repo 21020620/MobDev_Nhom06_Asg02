@@ -23,6 +23,8 @@ lifecycleViewmodelCompose = "1.0.0-alpha07"
 playServicesAuth = "21.1.0"
 uiTextGoogleFonts = "1.6.7"
 lifecycleLivedataKtx = "2.7.0"
+koinTestJUnit4 = "3.5.5"
+ioMockkAndroid = "1.13.10"
 
 [libraries]
 androidx-test-core = { group = "androidx.test", name = "core", version.ref = "androidxTestCore" }
@@ -53,6 +55,8 @@ koin-androidx-compose = { module = "io.insert-koin:koin-androidx-compose", versi
 koin-annotations-bom = { module = "io.insert-koin:koin-annotations-bom", version.ref = "koinAnnotationsBom" }
 koin-annotations = { module = "io.insert-koin:koin-annotations" }
 koin-compiler = { module = "io.insert-koin:koin-ksp-compiler", version.ref = "koinAnnotationsBom" }
+koin-test-junit4 = { module = "io.insert-koin:koin-test-junit4", version.ref = "koinTestJUnit4" }
+io-mockk-android = { module = "io.mockk:mockk-android", version.ref = "ioMockkAndroid" }
 
 firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "firebaseBom" }
 firebase-auth = { module = "com.google.firebase:firebase-auth" }
