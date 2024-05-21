@@ -28,6 +28,8 @@ class BookDetailViewModel(
         book = savedStateHandle.get<Book>("book")
     }
 
+    var similarBooks by mutableStateOf(listOf<Book>())
+
     var isLoading by mutableStateOf<Boolean>(true)
 
     fun getBookDetails(bookID: String) {
@@ -37,6 +39,20 @@ class BookDetailViewModel(
                 savedStateHandle["book"] = fetchedBook
                 book = fetchedBook
                 isLoading = false
+            } catch (e: Exception) {
+                Log.e("FETCH DATA FAILURE", "$e")
+            }
+        }
+    }
+
+    fun getSimilarBooks(bookID: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val fetchedBook = bookRepo.getSimilarBooks(bookID)
+                fetchedBook?.let {
+                    similarBooks = it
+                }
+
             } catch (e: Exception) {
                 Log.e("FETCH DATA FAILURE", "$e")
             }

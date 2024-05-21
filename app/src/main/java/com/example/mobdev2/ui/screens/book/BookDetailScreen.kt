@@ -1,9 +1,12 @@
 package com.example.mobdev2.ui.screens.book
 
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +15,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -35,15 +40,21 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.mobdev2.CachingResults
 import com.example.mobdev2.R
+import com.example.mobdev2.repo.model.Book
 import com.example.mobdev2.ui.components.CustomButton
 import com.example.mobdev2.ui.components.ProgressDots
 import com.example.mobdev2.ui.components.book.BookDetailTopUI
@@ -66,12 +77,14 @@ fun BookDetailScreen(
 ) {
 
     val book = viewModel.book
+    val similarBooks = viewModel.similarBooks
     var added by remember {
         mutableStateOf(CachingResults.currentUser.library.contains(bookID))
     }
 
     LaunchedEffect(key1 = bookID) {
         viewModel.getBookDetails(bookID)
+        viewModel.getSimilarBooks(bookID)
         viewModel.loadHighlight(bookID)
     }
     Scaffold(
@@ -146,6 +159,10 @@ fun BookDetailScreen(
                                 textAlign = TextAlign.Justify,
                                 color = MaterialTheme.colorScheme.onBackground,
                             )
+
+                            Spacer(modifier = Modifier.height(70.dp))
+
+                            SimilarBooks(similarBooks)
                         }
                     }
                 }
@@ -259,6 +276,63 @@ fun BookDetailBottomBar(
                 tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.padding(5.dp)
             )
+        }
+    }
+}
+
+
+//@Preview(showBackground = true)
+@Composable
+fun SimilarBooks(similarBooks : List<Book>) {
+    Box(modifier = Modifier
+        .background(MaterialTheme.colorScheme.inverseOnSurface)
+
+    ) {
+        Text(
+            text = "You might also like",
+            modifier = Modifier.padding(18.dp),
+            fontStyle = MaterialTheme.typography.displayLarge.fontStyle,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.secondary
+        )
+
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 28.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(similarBooks) { book ->
+                Column(
+                    Modifier
+                        .padding(top = 70.dp)
+                        .width(130.dp)
+                        .clickable {}
+                ) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current).data(book.imageURL)
+                            .crossfade(true).build(),
+                        placeholder = painterResource(id = R.drawable.placeholder_cat),
+                        contentDescription = "Book cover image",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .clip(RoundedCornerShape(6.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = book.title,
+                        fontStyle = MaterialTheme.typography.displaySmall.fontStyle,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                    Text(
+                        text = book.author,
+                        fontStyle = MaterialTheme.typography.labelSmall.fontStyle,
+                        color = MaterialTheme.colorScheme.secondary
+                    )
+                }
+            }
         }
     }
 }

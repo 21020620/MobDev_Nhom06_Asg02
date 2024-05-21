@@ -23,6 +23,32 @@ class BookRepository(private val db: FirebaseFirestore) {
 
         return book
     }
+
+    suspend fun getSimilarBooks(bookID: String): List<Book>? {
+        val collectionPath = "books"
+        return try {
+            val bookSnapshot = db.collection(collectionPath).document(bookID).get().await()
+            val currentBook = bookSnapshot.toObject(Book::class.java)
+
+            if (currentBook == null) {
+                Log.e("ERROR FETCHING BOOK DATA", "Book with ID $bookID not found")
+                return null
+            }
+
+            val currentBookSubjects = currentBook.subjects.toSet()
+
+            val snapshot = db.collection(collectionPath).get().await()
+            val similarBooks = snapshot.documents.mapNotNull { document ->
+                document.toObject(Book::class.java)?.copy(id = document.id)
+            }.filter { book ->
+                book.subjects.any {subject -> subject in currentBookSubjects }
+            }
+            similarBooks
+        } catch (e: Exception) {
+            Log.e("ERROR FETCHING REVIEWS DATA", "$e")
+            null
+        }
+    }
 }
 
 @Single
