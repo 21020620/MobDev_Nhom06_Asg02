@@ -28,7 +28,7 @@ class BookDetailViewModel(
         book = savedStateHandle.get<Book>("book")
     }
 
-    var isLoading by mutableStateOf<Boolean>(true)
+    var isLoading by mutableStateOf(true)
 
     fun getBookDetails(bookID: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -36,7 +36,6 @@ class BookDetailViewModel(
                 val fetchedBook = bookRepo.getBookByID(bookID)
                 savedStateHandle["book"] = fetchedBook
                 book = fetchedBook
-                isLoading = false
             } catch (e: Exception) {
                 Log.e("FETCH DATA FAILURE", "$e")
             }
@@ -71,13 +70,19 @@ class BookDetailViewModel(
                 try {
                     val stringList = document.get("highlights") as List<String>
                     CachingResults.highlights = stringList.map {
-                        it.split(",").map { num ->
-                            num.toInt()
+                        if(!it.isNullOrBlank()) {
+                            it.split(",").map { num ->
+                                num.toInt()
+                            }
+                        } else {
+                            listOf()
                         }
                     }
                     Log.d("CACHING RESULT", CachingResults.highlights.joinToString("/"))
+                    isLoading = false
                 } catch (e: Exception) {
                     Log.d("HIGHLIGHT", "NO HIGHLIGHT: $e")
+                    isLoading = false
                 }
             }
             .addOnFailureListener {

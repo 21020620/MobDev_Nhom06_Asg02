@@ -21,8 +21,7 @@ import com.example.mobdev2.R
 import com.example.mobdev2.ui.screens.NavGraphs
 import com.example.mobdev2.ui.screens.appCurrentDestinationAsState
 import com.example.mobdev2.ui.screens.destinations.AllBookScreenDestination
-import com.example.mobdev2.ui.screens.destinations.BookDetailScreenDestination
-import com.example.mobdev2.ui.screens.destinations.BookForumScreenDestination
+import com.example.mobdev2.ui.screens.destinations.AdvancedSearchScreenDestination
 import com.example.mobdev2.ui.screens.destinations.Destination
 import com.example.mobdev2.ui.screens.destinations.LibraryScreenDestination
 import com.example.mobdev2.ui.screens.destinations.SettingsScreenDestination
@@ -60,6 +59,6 @@ enum class BottomBarDestination(
 ) {
     AllBook(AllBookScreenDestination, Icons.Default.Home, R.string.book_all_screen),
     BookLibrary(LibraryScreenDestination, Icons.Default.LibraryBooks, R.string.book_library),
-    BookForum(BookForumScreenDestination, Icons.Default.Forum, R.string.book_forum_screen),
+    AdvancedSearch(AdvancedSearchScreenDestination, Icons.Default.Forum, R.string.advanced_search),
     Settings(SettingsScreenDestination, Icons.Default.Settings, R.string.book_settings_screen)
 }

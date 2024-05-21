@@ -60,7 +60,7 @@ fun BookHomeScreen(
             val navBackStackEntry = navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry.value?.destination
 
-            if(arrayOf("all_book_screen", "book_forum_screen", "settings_screen", "library_screen").contains(currentDestination?.route)) {
+            if(arrayOf("all_book_screen", "advanced_search_screen", "settings_screen", "library_screen").contains(currentDestination?.route)) {
                 BottomBar(navController)
             }
         }){ padding ->
