@@ -312,7 +312,7 @@ fun ReadBookScreen(
                                             modifier = Modifier.size(30.dp)
                                         )
                                     }
-                                    
+
                                     DropdownMenu(
                                         expanded = expandMenu.value,
                                         onDismissRequest = viewModel::toggleMenu) {
@@ -457,7 +457,7 @@ fun BottomBar(
         IconButton(onClick = {
             onPlayStopAudioClick()
             isPlayingAudio.value = !isPlayingAudio.value
-                             }, modifier = Modifier.weight(1f)) {
+        }, modifier = Modifier.weight(1f)) {
             Icon(
                 imageVector = if(!isPlayingAudio.value) Icons.Filled.PlayCircleOutline else Icons.Filled.PauseCircle,
                 contentDescription = null,
@@ -483,5 +483,4 @@ fun BottomBar(
         }
     }
 }
-
 

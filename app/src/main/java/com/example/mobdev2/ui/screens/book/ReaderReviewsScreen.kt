@@ -54,6 +54,20 @@ import org.koin.androidx.compose.koinViewModel
 import kotlin.math.roundToInt
 
 
+val prohibitedWords = listOf(
+    "racist", "nazi", "homophobic", "faggot", "dyke", "n-word", "spic", "chink", "kike", "slant-eye",
+    "kill", "murder", "bomb", "terror", "attack", "beat", "rape", "stab", "shoot",
+    "porn", "sex", "blowjob", "anal", "nudes", "dick", "pussy", "tits", "horny", "cum", "erotic",
+    "self-harm", "suicide", "overdose", "cutting", "kill myself", "hang", "poison",
+    "click here", "free money", "lottery winner", "make money fast", "buy now", "act now", "subscribe", "win big",
+    "address", "phone number", "social security number", "credit card number", "bank account", "personal info",
+    "fake news", "hoax", "conspiracy", "plandemic", "crisis actor", "antivax", "deep state", "flat earth",
+    "fuck", "shit", "asshole", "bitch", "bastard", "cunt", "douchebag", "prick", "whore", "slut",
+    "drugs", "cocaine", "heroin", "meth", "LSD", "ecstasy", "weed", "crack", "pill",
+    "hate speech", "harassment", "bullying", "discrimination", "revenge porn"
+)
+
+
 @BookNavGraph
 @Destination
 @Composable
@@ -175,16 +189,15 @@ fun ReaderReviewsScreen(
                         }
                     },
                     confirmButton = {
-                        TextButton(
-                            onClick = {
-                                showDialog = false
-                                viewModel.reviewBook(bookID, reviewText, starRating)
-                                reviewText = ""
-                                starRating = 5
-                          }
-                        ) {
-                            Text("Submit")
-                        }
+                        SubmitReviewButton(
+                            viewModel = viewModel,
+                            bookID = bookID,
+                            reviewText = reviewText,
+                            starRating = starRating,
+                            onDismissRequest = { showDialog = false },
+                            onClearReviewText = { reviewText = "" },
+                            onClearStarRating = { starRating = 5 }
+                        )
                     },
                     dismissButton = {
                         TextButton(onClick = { showDialog = false }) {
@@ -251,11 +264,11 @@ fun ReviewItem(viewModel: ReaderReviewsModel, review: Review, bookID: String, mo
                 if (review.replies.isNotEmpty()) {
                     if (showAllReplies) {
                         review.replies.forEach { reply ->
-                            ReplyItem(viewModel, bookID, reply, modifier = Modifier.padding(start = 20.dp))
+                            ReplyItem(viewModel, bookID, reply, modifier = Modifier.padding(start = 10.dp))
                         }
                     } else {
                         review.replies.take(2).forEach { reply ->
-                            ReplyItem(viewModel, bookID, reply, modifier = Modifier.padding(start = 20.dp))
+                            ReplyItem(viewModel, bookID, reply, modifier = Modifier.padding(start = 10.dp))
                         }
                         if (review.replies.size > 2) {
                             TextButton(onClick = { showAllReplies = true }) {
@@ -310,7 +323,7 @@ fun ReviewItem(viewModel: ReaderReviewsModel, review: Review, bookID: String, mo
 
 @Composable
 fun ReplyItem(viewModel: ReaderReviewsModel, bookID: String, reply: Reply, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.padding(start = 15.dp, top = 10.dp)) {
+    Column(modifier = modifier.padding(start = 10.dp, top = 8.dp)) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.Top
@@ -355,5 +368,63 @@ fun StarRating(starRating: Int, onRatingChange: (Int) -> Unit) {
                 )
             }
         }
+    }
+}
+
+@Composable
+fun SubmitReviewButton(
+    viewModel: ReaderReviewsModel,
+    bookID: String,
+    reviewText: String,
+    starRating: Int,
+    onDismissRequest: () -> Unit,
+    onClearReviewText: () -> Unit,
+    onClearStarRating: () -> Unit
+) {
+    var showWarningDialog by remember { mutableStateOf(false) }
+    var detectedProhibitedWords by remember { mutableStateOf(listOf<String>()) }
+
+    fun containsProhibitedWords(text: String): List<String> {
+        val words = text.split(" ", ".", ",", "!", "?", ":", ";", "-", "_")
+        return words.filter { it.lowercase() in prohibitedWords }
+    }
+
+    TextButton(
+        onClick = {
+            val detectedWords = containsProhibitedWords(reviewText)
+            if (detectedWords.isNotEmpty()) {
+                detectedProhibitedWords = detectedWords
+                showWarningDialog = true
+            } else {
+                onDismissRequest()
+                viewModel.reviewBook(bookID, reviewText, starRating)
+                onClearReviewText()
+                onClearStarRating()
+            }
+        }
+    ) {
+        Text("Submit")
+    }
+
+    if (showWarningDialog) {
+        AlertDialog(
+            onDismissRequest = { showWarningDialog = false },
+            title = { Text("Warning") },
+            text = {
+                Column {
+                    Text("Your review contains prohibited words:")
+                    detectedProhibitedWords.forEach { word ->
+                        Text("- $word")
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = { showWarningDialog = false }
+                ) {
+                    Text("OK")
+                }
+            }
+        )
     }
 }
