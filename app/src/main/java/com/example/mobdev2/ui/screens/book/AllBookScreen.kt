@@ -1,5 +1,6 @@
 package com.example.mobdev2.ui.screens.book
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -213,7 +214,6 @@ fun AllBookScreen(
 fun DeterminateIndicator() {
     var currentProgress by remember { mutableStateOf(0f) }
     var timeLeftToReachGoal by remember { mutableStateOf(0L) }
-    val scope = rememberCoroutineScope()
     val db = FirebaseFirestore.getInstance()
     val email = FirebaseAuth.getInstance().currentUser?.email
     val username = email?.indexOf('@')?.let { email.substring(0, it) }
@@ -221,10 +221,14 @@ fun DeterminateIndicator() {
     if (userDocumentRef != null) {
         userDocumentRef.get().addOnSuccessListener { document ->
             if (document != null) {
-                val sessionDuration = document.getLong("sessionDuration") ?: 0L
+                val sessionDuration = document.getLong("session") ?: 0L
                 val goal = document.getLong("goal") ?: 1L
+                Log.d("GOAL", "$goal")
+                Log.d("SESSION", "$sessionDuration")
                 currentProgress = sessionDuration.toFloat() / goal.toFloat()
                 timeLeftToReachGoal = goal - sessionDuration
+                Log.d("PROGRESS", "$currentProgress")
+                Log.d("TIME LEFT", "$timeLeftToReachGoal")
             }
         }
     }

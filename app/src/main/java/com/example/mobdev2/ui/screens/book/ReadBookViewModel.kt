@@ -169,14 +169,16 @@ class ReadBookViewModel(
                         lastUpdate = document.get("lastUpdate") as Long
                     }
                     var session = document.get("session") as Long
+                    Log.d("SESSION", "SESSION: $session")
                     val lastUpdateDate = Instant.ofEpochMilli(lastUpdate).atZone(ZoneId.systemDefault()).toLocalDate()
                     val currentDate = Instant.ofEpochMilli(sessionEndTime).atZone(ZoneId.systemDefault()).toLocalDate()
                     session += sessionDuration
                     Log.d("SESSION", "LAST UPDATE: $lastUpdateDate")
                     Log.d("SESSION", "SESSION: $currentDate")
-                    Log.d("SESSION", "SESSION: $session")
+
                     if (lastUpdateDate != currentDate) {
                         userDocumentRef.set(hashMapOf("session" to sessionDuration, "lastUpdate" to sessionEndTime), SetOptions.merge())
+                        Log.d("SESSION", "SESSION AFTER: $session")
                     } else {
                         userDocumentRef.set(hashMapOf("session" to session, "lastUpdate" to sessionEndTime), SetOptions.merge())
                     }
