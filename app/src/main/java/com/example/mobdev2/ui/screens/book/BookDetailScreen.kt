@@ -59,6 +59,7 @@ import com.example.mobdev2.ui.components.CustomButton
 import com.example.mobdev2.ui.components.ProgressDots
 import com.example.mobdev2.ui.components.book.BookDetailTopUI
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
+import com.example.mobdev2.ui.screens.destinations.BookDetailScreenDestination
 import com.example.mobdev2.ui.screens.destinations.ChaptersDestination
 import com.example.mobdev2.ui.screens.destinations.ReadBookScreenDestination
 import com.example.mobdev2.ui.screens.destinations.ReaderReviewsScreenDestination
@@ -162,7 +163,9 @@ fun BookDetailScreen(
 
                             Spacer(modifier = Modifier.height(70.dp))
 
-                            SimilarBooks(similarBooks)
+                            SimilarBooks(similarBooks) {bookID ->
+                                navigator.navigate(BookDetailScreenDestination(bookID = bookID))
+                            }
                         }
                     }
                 }
@@ -283,8 +286,9 @@ fun BookDetailBottomBar(
 
 //@Preview(showBackground = true)
 @Composable
-fun SimilarBooks(similarBooks : List<Book>) {
+fun SimilarBooks(similarBooks : List<Book>, onClick: (String) -> Unit) {
     Box(modifier = Modifier
+        .fillMaxWidth()
         .background(MaterialTheme.colorScheme.inverseOnSurface)
 
     ) {
@@ -305,7 +309,7 @@ fun SimilarBooks(similarBooks : List<Book>) {
                     Modifier
                         .padding(top = 70.dp)
                         .width(130.dp)
-                        .clickable {}
+                        .clickable { onClick(book.id) }
                 ) {
                     AsyncImage(
                         model = ImageRequest.Builder(LocalContext.current).data(book.imageURL)

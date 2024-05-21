@@ -41,7 +41,7 @@ class BookRepository(private val db: FirebaseFirestore) {
             val similarBooks = snapshot.documents.mapNotNull { document ->
                 document.toObject(Book::class.java)?.copy(id = document.id)
             }.filter { book ->
-                book.subjects.any {subject -> subject in currentBookSubjects }
+                book.id != bookID && book.subjects.any {subject -> subject in currentBookSubjects }
             }
             similarBooks
         } catch (e: Exception) {
