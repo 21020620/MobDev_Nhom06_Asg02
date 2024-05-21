@@ -1,6 +1,8 @@
 package com.example.mobdev2.ui.screens.book
 
+import android.os.Build
 import androidx.activity.compose.BackHandler
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
@@ -74,6 +76,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.filled.PauseCircle
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.runtime.DisposableEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.screens.destinations.ReadBookSettingsDestination
@@ -91,6 +94,7 @@ object ReaderConstants {
 
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(FlowPreview::class)
 @Destination
 @BookNavGraph
@@ -99,6 +103,7 @@ fun ReadBookScreen(
     bookID: String,
     viewModel: ReadBookViewModel = koinViewModel(),
     navigator: DestinationsNavigator,
+
 ) {
     // Hide reader menu on back press.
     BackHandler(viewModel.state.showReaderMenu) {
@@ -166,9 +171,16 @@ fun ReadBookScreen(
             }
             isBookLoaded = true
         })
+        viewModel.startSession()
         viewModel.setBookID(bookID)
         if (viewModel.state.readerData?.lastChapterIndex != null && viewModel.state.readerData?.lastChapterIndex != ReaderConstants.DEFAULT_NONE) {
             scrollToPosition(viewModel.state.readerData?.lastChapterIndex!!, 0)
+        }
+    }
+
+    DisposableEffect(bookID) {
+        onDispose {
+            viewModel.endSession()
         }
     }
 

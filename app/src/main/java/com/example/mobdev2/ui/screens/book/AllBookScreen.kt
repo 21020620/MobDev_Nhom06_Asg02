@@ -35,6 +35,11 @@ import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -54,6 +59,8 @@ import com.example.mobdev2.R
 import com.example.mobdev2.repo.model.Book
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.screens.destinations.BookDetailScreenDestination
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 //import com.example.mobdev2.ui.theme.figeronaFont
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
@@ -72,7 +79,7 @@ fun AllBookScreen(
     val searchString = viewModel.searchString.collectAsState()
     val listType = viewModel.listType.collectAsState()
 
-    if(bookList.value.isEmpty()) {
+    if (bookList.value.isEmpty()) {
         LaunchedEffect(Unit) {
             viewModel.fetchBooks()
         }
@@ -90,6 +97,8 @@ fun AllBookScreen(
         }
     }
 
+
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -98,7 +107,7 @@ fun AllBookScreen(
                     titleContentColor = MaterialTheme.colorScheme.onBackground,
                 ),
                 title = {
-                    if(isSearching.value)
+                    if (isSearching.value)
                         TextField(
                             value = searchString.value,
                             onValueChange = viewModel::updateSearchString,
@@ -112,26 +121,31 @@ fun AllBookScreen(
                             }
                         )
                     else
-                        Text(
-                            text = listType.value,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.padding(bottom = 2.dp),
-                            fontSize = 22.sp,
-                            fontStyle = MaterialTheme.typography.headlineMedium.fontStyle
-                        )
+                        Column {
+                            Text(
+                                text = listType.value,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis,
+                                modifier = Modifier.padding(bottom = 2.dp),
+                                fontSize = 22.sp,
+                                fontStyle = MaterialTheme.typography.headlineMedium.fontStyle
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            DeterminateIndicator()
+
+                        }
 
                 },
                 actions = {
                     IconButton(onClick = viewModel::updateSearchState) {
                         Icon(
-                            imageVector = if(isSearching.value) Icons.Default.Cancel else Icons.Default.Search,
+                            imageVector = if (isSearching.value) Icons.Default.Cancel else Icons.Default.Search,
                             contentDescription = "Search for books"
                         )
                     }
                     IconButton(onClick = viewModel::updateListType) {
                         Icon(
-                            imageVector = if(listType.value == "All Books") Icons.Outlined.FavoriteBorder else Icons.Outlined.Favorite,
+                            imageVector = if (listType.value == "All Books") Icons.Outlined.FavoriteBorder else Icons.Outlined.Favorite,
                             contentDescription = "Show recommendation books"
                         )
                     }
@@ -144,8 +158,8 @@ fun AllBookScreen(
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            if(!isSearching.value) {
-                if(listType.value == "All Books") {
+            if (!isSearching.value) {
+                if (listType.value == "All Books") {
                     items(bookList.value.size) { idx ->
                         BookItemCard(
                             bookList.value[idx],
@@ -157,7 +171,8 @@ fun AllBookScreen(
                     }
                 } else {
                     bookList.value.filter {
-                        it.subjects.intersect(CachingResults.currentUser.favouriteTags.toSet()).isNotEmpty()
+                        it.subjects.intersect(CachingResults.currentUser.favouriteTags.toSet())
+                            .isNotEmpty()
                     }.map { it ->
                         item(
                             key = it.title
@@ -193,6 +208,63 @@ fun AllBookScreen(
         }
     }
 }
+
+@Composable
+fun DeterminateIndicator() {
+    var currentProgress by remember { mutableStateOf(0f) }
+    var timeLeftToReachGoal by remember { mutableStateOf(0L) }
+    val scope = rememberCoroutineScope()
+    val db = FirebaseFirestore.getInstance()
+    val email = FirebaseAuth.getInstance().currentUser?.email
+    val username = email?.indexOf('@')?.let { email.substring(0, it) }
+    val userDocumentRef = username?.let { db.collection("users").document(it) }
+    if (userDocumentRef != null) {
+        userDocumentRef.get().addOnSuccessListener { document ->
+            if (document != null) {
+                val sessionDuration = document.getLong("sessionDuration") ?: 0L
+                val goal = document.getLong("goal") ?: 1L
+                currentProgress = sessionDuration.toFloat() / goal.toFloat()
+                timeLeftToReachGoal = goal - sessionDuration
+            }
+        }
+    }
+
+    Row {
+        CircularProgressIndicator(
+            progress = currentProgress,
+            modifier = Modifier
+                .width(15.dp)
+                .height(15.dp),
+            color = MaterialTheme.colorScheme.secondary,
+            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(
+            text = "Today's Reading",
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(bottom = 2.dp),
+            style = TextStyle(
+                color = MaterialTheme.colorScheme.primary,
+                fontStyle = MaterialTheme.typography.labelSmall.fontStyle
+            )
+        )
+        Spacer(modifier = Modifier.width(10.dp))
+        Text(
+            text = "$timeLeftToReachGoal minutes left",
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier.padding(bottom = 2.dp),
+            style = TextStyle(
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f),
+                fontStyle = MaterialTheme.typography.labelSmall.fontStyle
+            )
+        )
+    }
+
+
+}
+
 @Composable
 fun BookItemCard(
     book: Book,

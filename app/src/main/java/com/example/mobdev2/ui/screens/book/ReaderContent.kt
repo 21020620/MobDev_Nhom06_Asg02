@@ -52,7 +52,6 @@ fun ReaderContent(
     LaunchedEffect(Unit) {
         textSize.floatValue = settingDataStore.fontSizeFlow.first()
     }
-    val backgroundColorStr by settingDataStore.backgroundFlow.collectAsState(initial = "")
     val textColorStr by settingDataStore.textColorFlow.collectAsState(initial = "")
 
     val textColor = remember { mutableStateOf(currentTextColor) }
