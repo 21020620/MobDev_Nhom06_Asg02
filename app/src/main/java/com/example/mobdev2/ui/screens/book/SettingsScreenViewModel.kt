@@ -10,6 +10,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.mobdev2.ui.theme.ThemeState
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel;
 
@@ -17,9 +22,13 @@ import org.koin.android.annotation.KoinViewModel;
 class SettingsScreenViewModel(
     application: Application,
     private val savedStateHandle: SavedStateHandle,
-    private val settingDataStore: UserPreferences
+    private val settingDataStore: UserPreferences,
+    private val db: FirebaseFirestore
 ) : AndroidViewModel(application) {
 
+
+    private val email = FirebaseAuth.getInstance().currentUser?.email
+    private val username = email?.indexOf('@')?.let { email.substring(0, it) }
     private val audioManager = application.getSystemService(Context.AUDIO_SERVICE) as AudioManager
     val maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC).toFloat()
     var currentVolume = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC).toFloat() / maxVolume
@@ -29,6 +38,26 @@ class SettingsScreenViewModel(
         ThemeState.darkModeState.value = !ThemeState.darkModeState.value
         viewModelScope.launch {
             settingDataStore.saveTheme(ThemeState.darkModeState.value)
+        }
+    }
+
+    fun setGoal(hour: Int, minute: Int) {
+//        Log.d("HOUR", "$hour")
+//        Log.d("MINUTE", "$minute")
+        val goal = hour * 60 + minute
+        val userDocumentRef = db.collection("users").document(username!!)
+        viewModelScope.launch {
+            try {
+                userDocumentRef.get().addOnSuccessListener {document ->
+                    if (document.get("session") != null || document.get("session") != 0) {
+                        userDocumentRef.set(hashMapOf("goal" to goal), SetOptions.merge())
+                    } else {
+                        userDocumentRef.set(hashMapOf("goal" to goal, "session" to 0), SetOptions.merge())
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("UPDATE GOAL", "FAILED: $e")
+            }
         }
     }
     fun setIsLoading() {
@@ -44,4 +73,3 @@ class SettingsScreenViewModel(
         )
     }
 }
-data class ThemeState(val isDarkTheme: Boolean)

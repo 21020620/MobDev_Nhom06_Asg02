@@ -1,8 +1,10 @@
 package com.example.mobdev2.ui.screens.book
 
 import android.media.MediaPlayer
+import android.os.Build
 import android.util.Log
 import androidx.annotation.Keep
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -16,6 +18,8 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.Font
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -28,11 +32,14 @@ import com.example.mobdev2.repo.model.Book
 import com.example.mobdev2.repo.model.ReaderData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.SetOptions
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.annotation.KoinViewModel
+import java.time.Instant
+import java.time.ZoneId
 import kotlin.math.max
 import kotlin.math.min
 @Keep
@@ -49,7 +56,7 @@ sealed class ReaderFont(val id: String, val name: String, val fontFamily: FontFa
     data object System : ReaderFont("system", "System Default", FontFamily.Default)
 
     @Keep
-    data object Georgia : ReaderFont("cursive", "Cursive", FontFamily(Font(R.font.georgia)))
+    data object Georgia : ReaderFont("cursive", "Georgia", FontFamily(Font(R.font.georgia)))
     @Keep
     data object OpenDyslexic :
         ReaderFont("openDyslexic", "OpenDyslexic", FontFamily(Font(R.font.open_dyslexic_regular)))
@@ -82,7 +89,8 @@ class ReadBookViewModel(
     private val bookRepo: BookRepository,
     private val readerDataRepo: ReaderDataRepository,
     private val savedStateHandle: SavedStateHandle,
-    private val db: FirebaseFirestore
+    private val db: FirebaseFirestore,
+    private val settingDataStore: UserPreferences
 ) : ViewModel() {
 
     var state by mutableStateOf(
@@ -91,6 +99,18 @@ class ReadBookViewModel(
             fontSize = 14f,
         )
     )
+    init {
+        viewModelScope.launch {
+            settingDataStore.fontFlow.collect { fontName ->
+                val font = ReaderFont.getFontByName(fontName)
+                state = state.copy(fontFamily = font)
+            }
+        }
+    }
+    private var sessionStartTime = 0L
+
+    private var _sessionDuration = MutableLiveData<Long>()
+    val sessionDuration: LiveData<Long> get() = _sessionDuration
 
     var chaptersState by mutableStateOf(ChaptersScreenState())
 
@@ -126,6 +146,45 @@ class ReadBookViewModel(
         if(CachingResults.highlights.size < chapterSize) {
             CachingResults.highlights = List(chapterSize) { listOf() }
             savedStateHandle["highlights"] = List(chapterSize) { listOf<Int>() }
+        }
+    }
+
+    fun startSession() {
+        sessionStartTime = System.currentTimeMillis()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun endSession() {
+        val sessionEndTime = System.currentTimeMillis()
+        // count the session duration in minutes
+        val sessionDuration = (sessionEndTime - sessionStartTime) / 1000 / 60
+        val db = FirebaseFirestore.getInstance()
+        val userDocumentRef = db.collection("users").document(userID!!)
+
+        viewModelScope.launch {
+            try {
+                userDocumentRef.get().addOnSuccessListener { document ->
+                    var lastUpdate = 0L
+                    if (document.get("lastUpdate") != null){
+                        lastUpdate = document.get("lastUpdate") as Long
+                    }
+                    var session = document.get("session") as Long
+                    val lastUpdateDate = Instant.ofEpochMilli(lastUpdate).atZone(ZoneId.systemDefault()).toLocalDate()
+                    val currentDate = Instant.ofEpochMilli(sessionEndTime).atZone(ZoneId.systemDefault()).toLocalDate()
+                    session += sessionDuration
+                    Log.d("SESSION", "LAST UPDATE: $lastUpdateDate")
+                    Log.d("SESSION", "SESSION: $currentDate")
+                    Log.d("SESSION", "SESSION: $session")
+                    if (lastUpdateDate != currentDate) {
+                        userDocumentRef.set(hashMapOf("session" to sessionDuration, "lastUpdate" to sessionEndTime), SetOptions.merge())
+                    } else {
+                        userDocumentRef.set(hashMapOf("session" to session, "lastUpdate" to sessionEndTime), SetOptions.merge())
+                    }
+
+                }
+            } catch (e: Exception) {
+                Log.e("UPDATE SESSION", "FAILED: $e")
+            }
         }
     }
 
