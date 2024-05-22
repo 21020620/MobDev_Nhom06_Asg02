@@ -42,14 +42,14 @@ class SettingsScreenViewModel(
     }
 
     fun setGoal(hour: Int, minute: Int) {
-//        Log.d("HOUR", "$hour")
-//        Log.d("MINUTE", "$minute")
         val goal = hour * 60 + minute
         val userDocumentRef = db.collection("users").document(username!!)
         viewModelScope.launch {
             try {
                 userDocumentRef.get().addOnSuccessListener {document ->
-                    if (document.get("session") != null || document.get("session") != 0) {
+                    // as? for safe cast
+                    val session = document.get("session") as? Long ?: 0L
+                    if (session != 0L) {
                         userDocumentRef.set(hashMapOf("goal" to goal), SetOptions.merge())
                     } else {
                         userDocumentRef.set(hashMapOf("goal" to goal, "session" to 0), SetOptions.merge())
