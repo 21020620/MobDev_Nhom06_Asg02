@@ -11,13 +11,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.mobdev2.repo.Authenticator
 import com.example.mobdev2.ui.screens.NavGraphs
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
+import org.koin.androidx.compose.get
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -26,22 +26,23 @@ import org.koin.core.parameter.parametersOf
 @Composable
 fun BookHomeScreen(
     navigator: DestinationsNavigator,
+    authenticator: Authenticator = get(),
     viewModel: BookHomeScreenViewModel = koinViewModel(parameters = {
         parametersOf(navigator)
     })
 ) {
     val navController = rememberNavController()
 
-    val authState = remember { mutableStateOf(Firebase.auth.currentUser) }
+    val authState = remember { mutableStateOf(authenticator.currentUser()) }
 
     DisposableEffect(Unit) {
         val listener = FirebaseAuth.AuthStateListener {
             authState.value = it.currentUser
         }
-        Firebase.auth.addAuthStateListener(listener)
+        authenticator.addAuthStateListener(listener)
 
         onDispose {
-            Firebase.auth.removeAuthStateListener(listener)
+            authenticator.removeAuthStateListener(listener)
         }
     }
 
