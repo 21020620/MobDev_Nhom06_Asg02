@@ -23,10 +23,9 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mobdev2.CachingResults
 import com.example.mobdev2.R
-import com.example.mobdev2.repo.BookRepository
+import com.example.mobdev2.repo.BookRepositoryImpl
 import com.example.mobdev2.repo.ReaderDataRepository
 import com.example.mobdev2.repo.model.Book
 import com.example.mobdev2.repo.model.ReaderData
@@ -86,7 +85,7 @@ data class ChaptersScreenState(
 
 @KoinViewModel
 class ReadBookViewModel(
-    private val bookRepo: BookRepository,
+    private val bookRepo: BookRepositoryImpl,
     private val readerDataRepo: ReaderDataRepository,
     private val savedStateHandle: SavedStateHandle,
     private val db: FirebaseFirestore,

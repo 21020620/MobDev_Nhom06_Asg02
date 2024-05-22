@@ -38,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
@@ -45,7 +46,7 @@ import kotlinx.coroutines.delay
 @Preview (showBackground = true)
 @Composable
 fun ProgressDots(
-    modifier: Modifier = Modifier.padding(4.dp),
+    modifier: Modifier = Modifier.padding(4.dp).testTag("loadingIndicator"),
     color: Color = MaterialTheme.colorScheme.primary
 ) {
 
