@@ -229,11 +229,12 @@ class ReadBookViewModel(
             }
     }
 
-    fun loadChaptersContent(chapterContent: String) {
-        val mutableList = chaptersContent.value.toMutableList()
+    fun loadChaptersContent(chaptersContent: List<String>) {
+        val mutableList = MutableList(chapterSize.value) {AnnotatedString("")}
         for(i in 0..<chapterSize.value) {
             mutableList[i] = buildAnnotatedString {
-                append(chapterContent)
+                Log.d("Content", chaptersContent[i])
+                append(chaptersContent[i])
                 for (j in highlights.value[i].indices) {
                     if (j % 2 == 0) {
                         addStyle(SpanStyle(color = Color.Magenta), highlights.value[i][j], highlights.value[i][j + 1])
@@ -310,20 +311,6 @@ class ReadBookViewModel(
         CachingResults.highlights = mutableList.toList()
         updateHighlightDB()
         Log.d("REMOVED HIGHLIGHT ARRAY", highlights.value.joinToString(", "))
-    }
-
-    fun reload() {
-        val mutableContentList = chaptersContent.value.toMutableList()
-        mutableContentList[visibleChapterIndex.value] = buildAnnotatedString {
-            append(chaptersContent.value[visibleChapterIndex.value])
-            for (j in highlights.value[visibleChapterIndex.value].indices) {
-                if (j % 2 == 0) {
-                    addStyle(SpanStyle(color = Color.Magenta), highlights.value[visibleChapterIndex.value][j], highlights.value[visibleChapterIndex.value][j + 1])
-                    addStyle(SpanStyle(background = Color.Yellow), highlights.value[visibleChapterIndex.value][j], highlights.value[visibleChapterIndex.value][j + 1])
-                }
-            }
-        }
-        savedStateHandle["chaptersContent"] = mutableContentList.toList()
     }
 
     fun setVisibleChapterIndex(index: Int) {
