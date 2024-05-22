@@ -12,71 +12,27 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.displayCutoutPadding
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoFixNormal
-import androidx.compose.material.icons.filled.BookmarkRemove
-import androidx.compose.material.icons.filled.FormatPaint
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.NavigateBefore
-import androidx.compose.material.icons.filled.NavigateNext
-import androidx.compose.material.icons.filled.PlayCircleOutline
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
-import androidx.compose.material3.rememberDrawerState
-import androidx.compose.material3.surfaceColorAtElevation
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.material.icons.filled.PauseCircle
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.runtime.DisposableEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.mobdev2.ui.screens.book.main.BookNavGraph
 import com.example.mobdev2.ui.screens.destinations.ReadBookSettingsDestination
@@ -88,10 +44,8 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 
-
 object ReaderConstants {
     const val DEFAULT_NONE = -100000
-
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -103,7 +57,6 @@ fun ReadBookScreen(
     bookID: String,
     viewModel: ReadBookViewModel = koinViewModel(),
     navigator: DestinationsNavigator,
-
 ) {
     // Hide reader menu on back press.
     BackHandler(viewModel.state.showReaderMenu) {
@@ -131,7 +84,7 @@ fun ReadBookScreen(
         else -> currentBackground
     }
 
-    val scrollToPosition = { index: Int, offset: Int ->
+    val scrollToPosition: (Int, Int) -> Unit = { index, offset ->
         coroutineScope.launch {
             lazyListState.scrollToItem(index, offset)
         }
@@ -163,6 +116,7 @@ fun ReadBookScreen(
     }
 
     LaunchedEffect(bookID) {
+        viewModel.setScrollToPosition(scrollToPosition)
         viewModel.loadBook(bookID = bookID, onLoaded = {
             // if there is saved progress for this book, then scroll to
             // last page at exact position were used had left.
@@ -188,7 +142,7 @@ fun ReadBookScreen(
 
     LaunchedEffect(lazyListState, isBookLoaded) {
         launch {
-            if(isBookLoaded)
+            if (isBookLoaded)
                 updateFlow
                     .debounce(400)
                     .collect { visibleChapterOffset ->
@@ -219,6 +173,7 @@ fun ReadBookScreen(
     val drawerState = rememberDrawerState(DrawerValue.Closed)
     val chapters = viewModel.state.book?.chapters
 
+    var showSearch by remember { mutableStateOf(false) }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -232,7 +187,6 @@ fun ReadBookScreen(
                     modifier = Modifier.padding(start = 16.dp, top = 12.dp),
                     fontSize = 24.sp,
                     fontWeight = FontWeight.SemiBold,
-
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
@@ -305,11 +259,20 @@ fun ReadBookScreen(
                                     }
                                 },
                                 actions = {
-                                    IconButton(onClick = { /*TODO*/ }) {
-                                        Icon(
-                                            Icons.Filled.Search, null,
-                                            tint = MaterialTheme.colorScheme.onSurface,
-                                            modifier = Modifier.size(30.dp)
+                                    if (!showSearch) {
+                                        IconButton(onClick = { showSearch = true }) {
+                                            Icon(
+                                                Icons.Filled.Search, null,
+                                                tint = MaterialTheme.colorScheme.onSurface,
+                                                modifier = Modifier.size(30.dp)
+                                            )
+                                        }
+                                    }
+
+                                    if (showSearch) {
+                                        SearchBar(
+                                            viewModel = viewModel,
+                                            onClose = { showSearch = false }
                                         )
                                     }
 
@@ -323,7 +286,8 @@ fun ReadBookScreen(
 
                                     DropdownMenu(
                                         expanded = expandMenu.value,
-                                        onDismissRequest = viewModel::toggleMenu) {
+                                        onDismissRequest = viewModel::toggleMenu
+                                    ) {
                                         DropdownMenuItem(
                                             text = { Text(text = "Highlight") },
                                             onClick = {
@@ -431,6 +395,39 @@ fun ReadBookScreen(
 }
 
 @Composable
+fun SearchBar(viewModel: ReadBookViewModel, onClose: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        val keyboardController = LocalSoftwareKeyboardController.current
+
+        TextField(
+            value = viewModel.searchQuery,
+            onValueChange = { query -> viewModel.searchQuery = query },
+            keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
+            keyboardActions = KeyboardActions(onSearch = {
+                viewModel.performSearch(viewModel.searchQuery)
+                keyboardController?.hide()
+            }),
+            placeholder = { Text("Search...") },
+            modifier = Modifier.weight(1f)
+        )
+        IconButton(onClick = { viewModel.previousSearchResult() }) {
+            Icon(imageVector = Icons.Default.NavigateBefore, contentDescription = "Previous Result")
+        }
+        IconButton(onClick = { viewModel.nextSearchResult() }) {
+            Icon(imageVector = Icons.Default.NavigateNext, contentDescription = "Next Result")
+        }
+        IconButton(onClick = { viewModel.clearSearch(); onClose() }) {
+            Icon(imageVector = Icons.Default.Close, contentDescription = "Clear Search")
+        }
+    }
+}
+
+@Composable
 fun BottomBar(
     onNavigateBeforeClick: () -> Unit,
     onSettingsClick: () -> Unit,
@@ -467,7 +464,7 @@ fun BottomBar(
             isPlayingAudio.value = !isPlayingAudio.value
         }, modifier = Modifier.weight(1f)) {
             Icon(
-                imageVector = if(!isPlayingAudio.value) Icons.Filled.PlayCircleOutline else Icons.Filled.PauseCircle,
+                imageVector = if (!isPlayingAudio.value) Icons.Filled.PlayCircleOutline else Icons.Filled.PauseCircle,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onSurface,
                 modifier = Modifier.size(30.dp)
@@ -491,4 +488,3 @@ fun BottomBar(
         }
     }
 }
-

@@ -97,6 +97,7 @@ dependencies {
     implementation(libs.firebase.storage)
 
     implementation(libs.compose.destination)
+    implementation(libs.androidx.runtime.livedata)
     ksp(libs.compose.destination.ksp)
 
     implementation(platform(libs.koin.annotations.bom))

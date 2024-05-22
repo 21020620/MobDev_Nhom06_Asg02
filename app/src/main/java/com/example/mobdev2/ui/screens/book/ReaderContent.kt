@@ -40,7 +40,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.first
 
-
 @Composable
 fun ReaderContent(
     viewModel: ReadBookViewModel,
@@ -68,15 +67,13 @@ fun ReaderContent(
 
     viewModel.setChapterSize(viewModel.state.book!!.chapters.size)
 
-
     val chaptersContentInitial = viewModel.state.book!!.chapters.map { it.content }
     viewModel.loadChaptersContent(chaptersContentInitial)
     isLoading.value = false
 
-
     val chaptersContent = viewModel.chaptersContent.collectAsState()
 
-    if(isLoading.value) {
+    if (isLoading.value) {
         CircularProgressIndicator(
             modifier = Modifier
                 .width(64.dp),
@@ -96,7 +93,7 @@ fun ReaderContent(
                 Log.d("Content here", chaptersContent.value[index].toString())
                 ChapterLazyItem(
                     chapterName = chapter.name,
-                    chapterContent = chaptersContent.value[index],
+                    chapterContent = viewModel.highlightSearchResults(chaptersContent.value[index], index),
                     state = viewModel.state,
                     textColor = textColor.value,
                     textSize = textSize.value,
@@ -106,6 +103,25 @@ fun ReaderContent(
         }
     }
 }
+
+fun ReadBookViewModel.highlightSearchResults(content: AnnotatedString, chapterIndex: Int): AnnotatedString {
+    if (searchQuery.isEmpty()) return content
+
+    val chapterResults = searchResults.getOrNull(chapterIndex) ?: return content
+
+    val highlightedContent = buildAnnotatedString {
+        append(content)
+        chapterResults.forEach { index ->
+            addStyle(
+                style = SpanStyle(background = Color.Yellow),
+                start = index,
+                end = index + searchQuery.length
+            )
+        }
+    }
+    return highlightedContent
+}
+
 
 @Composable
 private fun ChapterLazyItem(
@@ -149,7 +165,7 @@ private fun ChapterLazyItem(
                 color = textColor,
             ),
             textAlign = TextAlign.Justify,
-            modifier = when(readingAction.value) {
+            modifier = when (readingAction.value) {
                 "Read" -> Modifier.padding(start = 14.dp, end = 14.dp, bottom = 8.dp)
                 "Highlight" -> Modifier
                     .padding(start = 14.dp, end = 14.dp, bottom = 8.dp)

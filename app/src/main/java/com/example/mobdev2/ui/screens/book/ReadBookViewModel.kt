@@ -41,6 +41,7 @@ import java.time.Instant
 import java.time.ZoneId
 import kotlin.math.max
 import kotlin.math.min
+
 @Keep
 sealed class ReaderFont(val id: String, val name: String, val fontFamily: FontFamily) {
 
@@ -82,7 +83,6 @@ data class ChaptersScreenState(
     val readerData: ReaderData? = null
 )
 
-
 @KoinViewModel
 class ReadBookViewModel(
     private val bookRepo: BookRepositoryImpl,
@@ -98,6 +98,22 @@ class ReadBookViewModel(
             fontSize = 14f,
         )
     )
+
+    var searchQuery by mutableStateOf("")
+    var searchResults by mutableStateOf(listOf<List<Int>>())
+    var currentSearchResultIndex by mutableStateOf(-1)
+    var chapterLengths by mutableStateOf(listOf<Int>())
+
+    private var scrollToPosition: ((Int, Int) -> Unit)? = null
+
+    fun setScrollToPosition(scrollToPosition: (Int, Int) -> Unit) {
+        this.scrollToPosition = scrollToPosition
+    }
+
+    private fun calculateChapterLengths(book: Book) {
+        chapterLengths = book.chapters.map { it.content.length }
+    }
+
     init {
         viewModelScope.launch {
             settingDataStore.fontFlow.collect { fontName ->
@@ -106,6 +122,7 @@ class ReadBookViewModel(
             }
         }
     }
+
     private var sessionStartTime = 0L
 
     private var _sessionDuration = MutableLiveData<Long>()
@@ -131,7 +148,7 @@ class ReadBookViewModel(
     private val audioUrl = savedStateHandle.getStateFlow("audioUrl", "")
 
     private lateinit var mediaPlayer: MediaPlayer
-    private val  _bookID = mutableStateOf("")
+    private val _bookID = mutableStateOf("")
 
     private val startIdx = savedStateHandle.getStateFlow("startIdx", 0)
     val expandMenu = savedStateHandle.getStateFlow("expandMenu", false)
@@ -141,8 +158,8 @@ class ReadBookViewModel(
 
     fun setChapterSize(chapterSize: Int) {
         _chapterSize.intValue = chapterSize
-        savedStateHandle["chaptersContent"] = List(chapterSize) {AnnotatedString("")}
-        if(CachingResults.highlights.size < chapterSize) {
+        savedStateHandle["chaptersContent"] = List(chapterSize) { AnnotatedString("") }
+        if (CachingResults.highlights.size < chapterSize) {
             CachingResults.highlights = List(chapterSize) { listOf() }
             savedStateHandle["highlights"] = List(chapterSize) { listOf<Int>() }
         }
@@ -164,7 +181,7 @@ class ReadBookViewModel(
             try {
                 userDocumentRef.get().addOnSuccessListener { document ->
                     var lastUpdate = 0L
-                    if (document.get("lastUpdate") != null){
+                    if (document.get("lastUpdate") != null) {
                         lastUpdate = document.get("lastUpdate") as Long
                     }
                     var session = document.get("session") as Long
@@ -181,7 +198,6 @@ class ReadBookViewModel(
                     } else {
                         userDocumentRef.set(hashMapOf("session" to session, "lastUpdate" to sessionEndTime), SetOptions.merge())
                     }
-
                 }
             } catch (e: Exception) {
                 Log.e("UPDATE SESSION", "FAILED: $e")
@@ -229,8 +245,8 @@ class ReadBookViewModel(
     }
 
     fun loadChaptersContent(chaptersContent: List<String>) {
-        val mutableList = MutableList(chapterSize.value) {AnnotatedString("")}
-        for(i in 0..<chapterSize.value) {
+        val mutableList = MutableList(chapterSize.value) { AnnotatedString("") }
+        for (i in 0 until chapterSize.value) {
             mutableList[i] = buildAnnotatedString {
                 Log.d("Content", chaptersContent[i])
                 append(chaptersContent[i])
@@ -244,8 +260,6 @@ class ReadBookViewModel(
         }
         savedStateHandle["chaptersContent"] = mutableList.toList()
     }
-
-
 
     fun setEndIdx(endIdx: Int) {
         savedStateHandle["endIdx"] = endIdx
@@ -429,4 +443,79 @@ class ReadBookViewModel(
             ((1f - visiblePortion / firstVisibleItem.size.toFloat())).coerceIn(0f, 1f)
         }
     }
+
+    fun performSearch(query: String) {
+        Log.d("PERFORM_SEARCH", "Performing search for query: $query")
+        searchQuery = query
+        searchResults = findSearchResults(query)
+        if (searchResults.isNotEmpty()) {
+            currentSearchResultIndex = 0
+            scrollToSearchResult()
+        }
+    }
+    fun findSearchResults(query: String): List<List<Int>> {
+        val results = mutableListOf<List<Int>>()
+        chaptersContent.value.forEach { chapter ->
+            val chapterResults = mutableListOf<Int>()
+            var index = chapter.text.indexOf(query, 0, ignoreCase = true)
+            while (index >= 0) {
+                chapterResults.add(index)
+                index = chapter.text.indexOf(query, index + 1, ignoreCase = true)
+            }
+            results.add(chapterResults)
+        }
+        Log.d("SEARCH_RESULTS", "Found results for query: $query")
+        return results
+    }
+
+
+
+    fun scrollToSearchResult() {
+        if (currentSearchResultIndex >= 0) {
+            var cumulativeIndex = 0
+            for ((chapterIndex, chapterResults) in searchResults.withIndex()) {
+                if (currentSearchResultIndex < cumulativeIndex + chapterResults.size) {
+                    val chapterResultIndex = currentSearchResultIndex - cumulativeIndex
+                    val position = chapterResults[chapterResultIndex]
+                    setVisibleChapterIndex(chapterIndex)
+                    val (lineIndex, charOffset) = calculateChapterOffset(chapterIndex, position)
+                    scrollToPosition?.invoke(chapterIndex, lineIndex)
+                    return
+                }
+                cumulativeIndex += chapterResults.size
+            }
+        }
+    }
+
+    fun calculateChapterOffset(chapterIndex: Int, position: Int): Pair<Int, Int> {
+        val chapterContent = chaptersContent.value[chapterIndex].text
+        val beforePosition = chapterContent.substring(0, position)
+        val lines = beforePosition.split("\n")
+        val lineIndex = lines.size - 1
+        val charOffset = lines.last().length
+
+        return lineIndex to charOffset
+    }
+
+    fun nextSearchResult() {
+        if (currentSearchResultIndex < searchResults.flatten().size - 1) {
+            currentSearchResultIndex++
+            scrollToSearchResult()
+        }
+    }
+
+    fun previousSearchResult() {
+        if (currentSearchResultIndex > 0) {
+            currentSearchResultIndex--
+            scrollToSearchResult()
+        }
+    }
+
+    fun clearSearch() {
+        searchQuery = ""
+        searchResults = listOf()
+        currentSearchResultIndex = -1
+    }
+
+
 }
