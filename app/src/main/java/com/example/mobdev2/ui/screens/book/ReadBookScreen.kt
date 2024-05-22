@@ -184,10 +184,6 @@ fun ReadBookScreen(
         }
     }
 
-    LaunchedEffect(Unit) {
-        viewModel.getAudioFile()
-    }
-
     val updateFlow = snapshotFlow { lazyListState.firstVisibleItemScrollOffset }
 
     LaunchedEffect(lazyListState, isBookLoaded) {
@@ -399,7 +395,7 @@ fun ReadBookScreen(
                         onSettingsClick = {
                             navigator.navigate(ReadBookSettingsDestination)
                         },
-                        onPlayStopAudioClick = { viewModel.toggleAudio() },
+                        onPlayStopAudioClick = { viewModel.toggleAudio(lazyListState.firstVisibleItemIndex + 1) },
                         onMenuClick = { coroutineScope.launch { drawerState.open() } },
                         onNavigateNextClick = { navigateToNextChapter() }
                     )

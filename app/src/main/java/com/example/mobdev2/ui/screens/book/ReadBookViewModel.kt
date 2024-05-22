@@ -365,27 +365,24 @@ class ReadBookViewModel(
         return newRanges.toList()
     }
 
-    fun getAudioFile() {
-        val storageRef = FirebaseStorage.getInstance().reference
-        val fileRef = storageRef.child("synthesis.wav")
-        fileRef.downloadUrl.addOnSuccessListener { uri ->
-            savedStateHandle["audioUrl"] = uri.toString()
-        }.addOnFailureListener {
-            Log.e("AUDIO", "Failed to play audio: $it")
-        }
-    }
-
-    fun toggleAudio() {
+    fun toggleAudio(idx: Int) {
         if (isPlayingAudio.value) {
             savedStateHandle["isPlayingAudio"] = false
             mediaPlayer.stop()
             mediaPlayer.release()
         } else {
-            savedStateHandle["isPlayingAudio"] = true
-            mediaPlayer = MediaPlayer().apply {
-                setDataSource(audioUrl.value)
-                prepare()
-                start()
+            val storageRef = FirebaseStorage.getInstance().reference
+            val audioFileName = _bookID.value.replace(' ', '_') + "_$idx.mp3"
+            val fileRef = storageRef.child(audioFileName)
+            fileRef.downloadUrl.addOnSuccessListener { uri ->
+                mediaPlayer = MediaPlayer().apply {
+                    setDataSource(uri.toString())
+                    prepare()
+                    start()
+                }
+                savedStateHandle["isPlayingAudio"] = true
+            }.addOnFailureListener {
+                Log.e("AUDIO", "Failed to play audio: $it")
             }
         }
     }
