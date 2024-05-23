@@ -145,7 +145,6 @@ class ReadBookViewModel(
     private val userID = email?.indexOf('@')?.let { email.substring(0, it) }
 
     val isPlayingAudio = savedStateHandle.getStateFlow("isPlayingAudio", false)
-    private val audioUrl = savedStateHandle.getStateFlow("audioUrl", "")
 
     private lateinit var mediaPlayer: MediaPlayer
     private val _bookID = mutableStateOf("")

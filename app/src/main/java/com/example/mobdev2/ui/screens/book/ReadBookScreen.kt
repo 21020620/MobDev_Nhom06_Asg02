@@ -177,7 +177,7 @@ fun ReadBookScreen(
 
     DisposableEffect(Unit) {
         onDispose {
-            viewModel.toggleAudio(lazyListState.firstVisibleItemIndex + 1)
+            if(isPlayingAudio.value) viewModel.toggleAudio(lazyListState.firstVisibleItemIndex + 1)
         }
     }
 
