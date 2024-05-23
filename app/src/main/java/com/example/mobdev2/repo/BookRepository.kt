@@ -86,8 +86,10 @@ class ReaderDataRepository(private val db: FirebaseFirestore) {
 }
 
 @Single
-class ReviewRepository(private val db: FirebaseFirestore) {
-    suspend fun saveReviewData(bookID: String, reviewData: Review, reviewID: Int) {
+class ReviewRepository(
+    private val db: FirebaseFirestore
+) : ReviewRepo {
+    override suspend fun saveReviewData(bookID: String, reviewData: Review, reviewID: Int) {
         val documentPath = "books/${bookID}/reviews/${reviewID}"
 
         try {
@@ -97,7 +99,7 @@ class ReviewRepository(private val db: FirebaseFirestore) {
         }
     }
 
-    suspend fun addReplyData(bookID: String, replyData: Reply, reviewID: Int) {
+    override suspend fun addReplyData(bookID: String, replyData: Reply, reviewID: Int) {
         val documentPath = "books/${bookID}/reviews/${reviewID}/replies"
 
         try {
@@ -107,7 +109,7 @@ class ReviewRepository(private val db: FirebaseFirestore) {
         }
     }
 
-    suspend fun getReviewsData(bookID: String): List<Review>? {
+    override suspend fun getReviewsData(bookID: String): List<Review>? {
         val collectionPath = "books/$bookID/reviews"
         return try {
             val snapshot = db.collection(collectionPath).get().await()
@@ -121,7 +123,7 @@ class ReviewRepository(private val db: FirebaseFirestore) {
         }
     }
 
-    suspend fun getRepliesData(bookID: String, reviewID: Int): List<Reply>? {
+    override suspend fun getRepliesData(bookID: String, reviewID: Int): List<Reply>? {
         val collectionPath = "books/${bookID}/reviews/${reviewID}/replies"
         return try {
             val snapshot = db.collection(collectionPath).get().await()
@@ -134,7 +136,7 @@ class ReviewRepository(private val db: FirebaseFirestore) {
         }
     }
 
-    suspend fun getReviewData(bookID: String, reviewID: Int): Review? {
+    override suspend fun getReviewData(bookID: String, reviewID: Int): Review? {
         val documentPath = "books/${bookID}/reviews/${reviewID}"
         return try {
             val snapshot = db.document(documentPath).get().await()
