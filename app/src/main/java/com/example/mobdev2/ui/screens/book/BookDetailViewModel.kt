@@ -8,7 +8,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mobdev2.CachingResults
-import com.example.mobdev2.repo.BookRepository
+import com.example.mobdev2.repo.Book2Repo
+import com.example.mobdev2.repo.BookRepo
 import com.example.mobdev2.repo.model.Book
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.Dispatchers
@@ -18,9 +19,9 @@ import org.koin.android.annotation.KoinViewModel
 
 @KoinViewModel
 class BookDetailViewModel(
-    private val bookRepo:BookRepository,
+    private val bookRepo: BookRepo,
+    private val book2Repo: Book2Repo,
     private val savedStateHandle: SavedStateHandle,
-    private val db: FirebaseFirestore
 ):ViewModel() {
     var book by mutableStateOf<Book?>(null)
         private set
@@ -30,7 +31,7 @@ class BookDetailViewModel(
 
     var similarBooks by mutableStateOf(listOf<Book>())
 
-    var isLoading by mutableStateOf<Boolean>(true)
+    var isLoading by mutableStateOf(true)
 
     fun getBookDetails(bookID: String) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -58,51 +59,30 @@ class BookDetailViewModel(
         }
     }
 
-    fun addBookToLib(bookID: String) = viewModelScope.launch(Dispatchers.IO) {
-        val userID = CachingResults.currentUser.name
-        val updates = hashMapOf<String, Any>(
-            "library" to CachingResults.currentUser.library + bookID
-        )
-
+    fun addBookToLib(bookID: String) {
+        viewModelScope.launch {
+            book2Repo.addBookToLibrary(bookID)
+        }
         CachingResults.currentUser = CachingResults.currentUser.copy(library = CachingResults.currentUser.library + bookID)
-
-        db.collection("users").document(userID)
-            .update(updates)
-            .addOnSuccessListener {
-                Log.d("UPDATE LIBRARY", "SUCCESS")
-            }
-            .addOnFailureListener { e ->
-                Log.d("UPDATE LIBRARY", "FAIL: $e")
-            }
     }
 
-    fun loadHighlight(bookID: String) {
-        db.collection("users")
-            .document(CachingResults.currentUser.name)
-            .collection("books")
-            .document(bookID)
-            .get()
-            .addOnSuccessListener { document ->
-                try {
-                    val stringList = document.get("highlights") as List<String>
-                    CachingResults.highlights = stringList.map {
-                        if(!it.isNullOrBlank()) {
-                            it.split(",").map { num ->
-                                num.toInt()
-                            }
-                        } else {
-                            listOf()
-                        }
+    fun loadHighlight(bookID: String) = viewModelScope.launch {
+        try {
+            val stringList = book2Repo.loadHighlight(bookID)
+            CachingResults.highlights = stringList.map {
+                if(it.isNotBlank()) {
+                    it.split(",").map { num ->
+                        num.toInt()
                     }
-                    Log.d("CACHING RESULT", CachingResults.highlights.joinToString("/"))
-                    isLoading = false
-                } catch (e: Exception) {
-                    Log.d("HIGHLIGHT", "NO HIGHLIGHT: $e")
-                    isLoading = false
+                } else {
+                    listOf()
                 }
             }
-            .addOnFailureListener {
-                Log.d("GET HIGHLIGHT FAILED", "$it")
-            }
+            Log.d("CACHING RESULT", CachingResults.highlights.joinToString("/"))
+            isLoading = false
+        } catch (e: Exception) {
+            Log.d("HIGHLIGHT", "NO HIGHLIGHT: $e")
+            isLoading = false
+        }
     }
 }

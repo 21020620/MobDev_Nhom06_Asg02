@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -38,7 +40,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.first
 
-
 @Composable
 fun ReaderContent(
     viewModel: ReadBookViewModel,
@@ -52,6 +53,9 @@ fun ReaderContent(
     LaunchedEffect(Unit) {
         textSize.floatValue = settingDataStore.fontSizeFlow.first()
     }
+    val isLoading = remember {
+        mutableStateOf(true)
+    }
     val textColorStr by settingDataStore.textColorFlow.collectAsState(initial = "")
 
     val textColor = remember { mutableStateOf(currentTextColor) }
@@ -64,34 +68,62 @@ fun ReaderContent(
     }
 
     viewModel.setChapterSize(viewModel.state.book!!.chapters.size)
-    val chapterSize = viewModel.chapterSize
 
-    for(i in 0..< chapterSize.value) {
-        viewModel.loadChaptersContent(viewModel.state.book!!.chapters[i].content)
-    }
+    val chaptersContentInitial = viewModel.state.book!!.chapters.map { it.content }
+    viewModel.loadChaptersContent(chaptersContentInitial)
+    isLoading.value = false
 
-    val chaptersContent = viewModel.chaptersContent.collectAsStateWithLifecycle()
+    val chaptersContent = viewModel.chaptersContent.collectAsState()
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        state = lazyListState
-    ) {
-        items(
-            count = viewModel.state.book!!.chapters.size,
-            key = { index -> viewModel.state.book!!.chapters[index].hashCode() }
-        ) { index ->
-            val chapter = viewModel.state.book!!.chapters[index]
-            ChapterLazyItem(
-                chapterName = chapter.name,
-                chapterContent = chaptersContent.value[index],
-                state = viewModel.state,
-                textColor = textColor.value,
-                textSize = textSize.value,
-                viewModel = viewModel
-            )
+    if (isLoading.value) {
+        CircularProgressIndicator(
+            modifier = Modifier
+                .width(64.dp),
+            color = MaterialTheme.colorScheme.secondary,
+            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+        )
+    } else {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            state = lazyListState
+        ) {
+            items(
+                count = viewModel.state.book!!.chapters.size,
+                key = { index -> viewModel.state.book!!.chapters[index].name }
+            ) { index ->
+                val chapter = viewModel.state.book!!.chapters[index]
+                Log.d("Content here", chaptersContent.value[index].toString())
+                ChapterLazyItem(
+                    chapterName = chapter.name,
+                    chapterContent = viewModel.highlightSearchResults(chaptersContent.value[index], index),
+                    state = viewModel.state,
+                    textColor = textColor.value,
+                    textSize = textSize.value,
+                    viewModel = viewModel
+                )
+            }
         }
     }
 }
+
+fun ReadBookViewModel.highlightSearchResults(content: AnnotatedString, chapterIndex: Int): AnnotatedString {
+    if (searchQuery.isEmpty()) return content
+
+    val chapterResults = searchResults.getOrNull(chapterIndex) ?: return content
+
+    val highlightedContent = buildAnnotatedString {
+        append(content)
+        chapterResults.forEach { index ->
+            addStyle(
+                style = SpanStyle(background = Color.Yellow),
+                start = index,
+                end = index + searchQuery.length
+            )
+        }
+    }
+    return highlightedContent
+}
+
 
 @Composable
 private fun ChapterLazyItem(
@@ -135,7 +167,7 @@ private fun ChapterLazyItem(
                 color = textColor,
             ),
             textAlign = TextAlign.Justify,
-            modifier = when(readingAction.value) {
+            modifier = when (readingAction.value) {
                 "Read" -> Modifier.padding(start = 14.dp, end = 14.dp, bottom = 8.dp)
                 "Highlight" -> Modifier
                     .padding(start = 14.dp, end = 14.dp, bottom = 8.dp)

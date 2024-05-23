@@ -11,9 +11,10 @@ import kotlinx.coroutines.tasks.await
 import org.koin.core.annotation.Single
 
 @Single
-class BookRepository(private val db: FirebaseFirestore) {
-
-    suspend fun getBookByID(bookID: String): Book? {
+class BookRepositoryImpl(
+    private val db: FirebaseFirestore
+) :BookRepo {
+    override suspend fun getBookByID(bookID: String): Book? {
         val bookDocument = db.collection("books").document(bookID).get().await()
         val book = bookDocument.toObject(Book::class.java)
         val chaptersCollection = bookDocument.reference.collection("chapters").get().await()
@@ -24,7 +25,7 @@ class BookRepository(private val db: FirebaseFirestore) {
         return book
     }
 
-    suspend fun getSimilarBooks(bookID: String): List<Book>? {
+    override suspend fun getSimilarBooks(bookID: String): List<Book>? {
         val collectionPath = "books"
         return try {
             val bookSnapshot = db.collection(collectionPath).document(bookID).get().await()

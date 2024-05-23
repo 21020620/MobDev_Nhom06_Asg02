@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -149,7 +150,7 @@ fun BookDetailScreen(
                                 fontStyle = MaterialTheme.typography.bodyMedium.fontStyle,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.onBackground,
-                                modifier = Modifier.padding(start = 12.dp, end = 8.dp),
+                                modifier = Modifier.padding(start = 12.dp, end = 8.dp).testTag("synopsis"),
                             )
 
                             Text(

@@ -39,6 +39,7 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
         freeCompilerArgs += "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api"
+        freeCompilerArgs += "-opt-in=androidx.compose.ui.test.ExperimentalTestApi"
     }
     buildFeatures {
         compose = true
@@ -96,6 +97,7 @@ dependencies {
     implementation(libs.firebase.storage)
 
     implementation(libs.compose.destination)
+    implementation(libs.androidx.runtime.livedata)
     ksp(libs.compose.destination.ksp)
 
     implementation(platform(libs.koin.annotations.bom))
