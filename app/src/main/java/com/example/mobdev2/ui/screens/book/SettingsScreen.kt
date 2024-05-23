@@ -1,5 +1,7 @@
 package com.example.mobdev2.ui.screens.book
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -55,6 +57,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -157,16 +160,16 @@ fun SettingsScreen(
                     modifier = Modifier.padding(top = 20.dp, start = 20.dp)
                 )
                 SoundSetting(viewModel)
-                HorizontalDivider()
-                Text(
-                    text = "Notifications",
-                    style =
-                    MaterialTheme.typography.bodyMedium.copy(
-                        fontWeight = FontWeight(700)
-                    ),
-                    modifier = Modifier.padding(top = 20.dp, start = 20.dp)
-                )
-                NotificationSetting()
+//                HorizontalDivider()
+//                Text(
+//                    text = "Notifications",
+//                    style =
+//                    MaterialTheme.typography.bodyMedium.copy(
+//                        fontWeight = FontWeight(700)
+//                    ),
+//                    modifier = Modifier.padding(top = 20.dp, start = 20.dp)
+//                )
+//                NotificationSetting(viewModel)
                 HorizontalDivider()
                 ReadingGoalSetting(viewModel)
                 HorizontalDivider()
@@ -265,14 +268,6 @@ fun ProfileCard() {
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight(700))
                 )
                 Text(text = email, style = MaterialTheme.typography.bodyLarge)
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(
-                    imageVector = Icons.Outlined.Edit,
-                    contentDescription = "Edit Profile",
-                    modifier = Modifier.padding(end = 5.dp)
-                )
             }
         }
     }
@@ -441,17 +436,23 @@ fun ReadingGoalSetting(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-@Preview
-fun NotificationSetting() {
-    var boolean by remember { mutableStateOf(true) }
+fun NotificationSetting(
+    viewModel: SettingsScreenViewModel
+) {
+    var boolean by remember { mutableStateOf(false) }
+    val context = LocalContext.current
     Card(
         modifier =
         Modifier
             .padding(20.dp)
             .fillMaxWidth()
             .wrapContentHeight()
-            .clickable { /* handle notification here */ },
+            .clickable {
+                boolean = !boolean
+//                viewModel.scheduleNotification(context, 11,42)
+            },
         shape = MaterialTheme.shapes.large,
         colors =
         CardDefaults.cardColors(
@@ -498,6 +499,8 @@ fun NotificationSetting() {
         }
     }
 }
+
+
 
 @Composable
 fun Logout(

@@ -57,8 +57,10 @@ fun ReaderContent(
     val textColor = remember { mutableStateOf(currentTextColor) }
     textColor.value = if (textColorStr == "light") {
         lightColorScheme().onBackground
-    } else {
+    } else if (textColorStr == "dark") {
         darkColorScheme().onBackground
+    } else {
+        currentTextColor
     }
 
     viewModel.setChapterSize(viewModel.state.book!!.chapters.size)

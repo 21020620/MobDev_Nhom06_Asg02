@@ -1,14 +1,19 @@
 package com.example.mobdev2.ui.screens.book;
 
+import android.app.AlarmManager
 import android.app.Application
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import android.icu.util.Calendar
 import android.media.AudioManager
+import android.os.Build
 import android.util.Log
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.platform.LocalContext
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.example.mobdev2.ui.screens.book.notification.NotificationBroadcastReceiver
 import com.example.mobdev2.ui.theme.ThemeState
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -40,6 +45,29 @@ class SettingsScreenViewModel(
             settingDataStore.saveTheme(ThemeState.darkModeState.value)
         }
     }
+
+//    @RequiresApi(Build.VERSION_CODES.O)
+//    fun scheduleNotification(context: Context, hour: Int, minute: Int){
+//        NotificationBroadcastReceiver.showNotificationNow(context)
+//        val intent = Intent(context, NotificationBroadcastReceiver::class.java)
+//
+//        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+//        val pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_MUTABLE)
+//        val calendar = Calendar.getInstance().apply {
+//            timeInMillis = System.currentTimeMillis()
+//            set(Calendar.HOUR_OF_DAY, hour)
+//            set(Calendar.MINUTE, minute)
+//            set(Calendar.SECOND, 0)
+//        }
+//        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, AlarmManager.INTERVAL_DAY, pendingIntent)
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+//        } else {
+//            alarmManager.setExact(AlarmManager.RTC_WAKEUP, calendar.timeInMillis, pendingIntent)
+//        }
+//
+//        Log.d("NotificationScheduler", "Notification scheduled for $hour:$minute")
+//    }
 
     fun setGoal(hour: Int, minute: Int) {
         val goal = hour * 60 + minute
