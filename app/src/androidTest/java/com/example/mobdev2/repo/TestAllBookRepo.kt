@@ -18,6 +18,17 @@ class TestAllBookRepo: AllBookRepo {
             listOf(Chapter("Chapter 01", "This is a Fake Chapter")),
             "This is a Fake Synopsis",
             listOf()
-        ))
+        ),
+            Book(
+                "Operating System Concepts",
+                "Operating System Concepts",
+                "Teacher Thanh",
+                listOf("Non-fiction", "Educational", "Thriller"),
+                "English",
+                "https://upload.wikimedia.org/wikipedia/en/thumb/6/6b/DaVinciCode.jpg/220px-DaVinciCode.jpg",
+                listOf(Chapter("Chapter 01", "This is a Fake Chapter for Operating System Concepts")),
+                "This is a Fake Synopsis for OS Theory",
+                listOf()
+            ))
     }
 }

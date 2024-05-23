@@ -25,6 +25,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -80,6 +81,7 @@ fun AdvancedSearchScreen (
                     value = searchContent.value,
                     onValueChange = viewModel::setSearchContent,
                     modifier = Modifier
+                        .testTag("input")
                         .weight(4f)
                         .padding(4.dp, 2.dp),
                 )
@@ -98,7 +100,7 @@ fun AdvancedSearchScreen (
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ManageSearch,
-                        contentDescription = "Search"
+                        contentDescription = "SearchButton"
                     )
                 }
             }

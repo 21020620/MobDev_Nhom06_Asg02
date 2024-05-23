@@ -1,8 +1,10 @@
 package com.example.mobdev2.ui
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.navigation.compose.rememberNavController
@@ -19,7 +21,7 @@ import org.junit.runner.RunWith
 import org.koin.test.KoinTest
 
 @RunWith(AndroidJUnit4::class)
-class AllBookScreenTest : KoinTest {
+class LibraryScreenTest : KoinTest {
     @get: Rule
     val composeRule = createComposeRule()
 
@@ -36,27 +38,44 @@ class AllBookScreenTest : KoinTest {
     }
 
     @Test
-    fun assert_AllBookScreen_canSeeBookList() {
+    fun assert_LibraryScreen_canAddBookToLib() {
         composeRule.onNodeWithText("The Da Vinci Code").assertIsDisplayed()
-        composeRule.onNodeWithText("The Da Vinci Code").performClick()
-    }
-
-    @Test
-    fun assert_AllBookScreen_canSeeBookDetail1() {
-        composeRule.onNodeWithText("The Da Vinci Code").assertIsDisplayed()
-        composeRule.onNodeWithText("The Da Vinci Code").performClick()
+        composeRule.onNodeWithText("Operating System Concepts").performClick()
 
         composeRule.waitUntilExactlyOneExists(hasTestTag("synopsis"), 5000L)
         composeRule.onNodeWithText("Synopsis").assertIsDisplayed()
         composeRule.onNodeWithText("This is a Fake Synopsis").assertIsDisplayed()
+
+        composeRule.onNodeWithContentDescription("Add book to lib").performClick()
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithContentDescription("Go back").performClick()
+        composeRule.onNodeWithText("Library").performClick()
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithText("Delete").assertIsDisplayed()
     }
 
     @Test
-    fun assert_AllBookScreen_canSeeSimilarBook() {
+    fun assert_LibraryScreen_canRemoveBookFromLib() {
         composeRule.onNodeWithText("The Da Vinci Code").assertIsDisplayed()
-        composeRule.onNodeWithText("The Da Vinci Code").performClick()
+        composeRule.onNodeWithText("Operating System Concepts").performClick()
 
         composeRule.waitUntilExactlyOneExists(hasTestTag("synopsis"), 5000L)
-        composeRule.onNodeWithText("The Green Beret").assertIsDisplayed()
+        composeRule.onNodeWithText("Synopsis").assertIsDisplayed()
+        composeRule.onNodeWithText("This is a Fake Synopsis").assertIsDisplayed()
+
+        composeRule.onNodeWithContentDescription("Add book to lib").performClick()
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithContentDescription("Go back").performClick()
+        composeRule.onNodeWithText("Library").performClick()
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithText("Delete").assertIsDisplayed()
+        composeRule.onNodeWithText("Delete").performClick()
+        composeRule.waitForIdle()
+
+        composeRule.onNodeWithText("Operating Systems Concepts").assertIsNotDisplayed()
     }
 }
