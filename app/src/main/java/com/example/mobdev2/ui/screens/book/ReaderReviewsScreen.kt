@@ -40,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -66,6 +67,11 @@ val prohibitedWords = listOf(
     "drugs", "cocaine", "heroin", "meth", "LSD", "ecstasy", "weed", "crack", "pill",
     "hate speech", "harassment", "bullying", "discrimination", "revenge porn"
 )
+
+fun containsProhibitedWords(text: String): List<String> {
+    val words = text.split(" ", ".", ",", "!", "?", ":", ";", "-", "_")
+    return words.filter { it.lowercase() in prohibitedWords }
+}
 
 
 @BookNavGraph
@@ -103,7 +109,9 @@ fun ReaderReviewsScreen(
                 icon = {
                     Icon(Icons.Filled.Edit, contentDescription = "Write review")
                 },
-                modifier = Modifier.padding(end = 10.dp, bottom = 8.dp),
+                modifier = Modifier
+                    .padding(end = 10.dp, bottom = 8.dp)
+                    .testTag("ReviewButton"),
             )
         },
         content = {paddingValues ->
@@ -178,7 +186,8 @@ fun ReaderReviewsScreen(
                             BasicTextField(
                                 value = reviewText,
                                 onValueChange = { reviewText = it },
-                                modifier = Modifier.padding(top = 16.dp),
+                                modifier = Modifier.padding(top = 16.dp)
+                                    .testTag("ReviewTextField"),
                                 decorationBox = { innerTextField ->
                                     if (reviewText.isEmpty()) {
                                         Text("Type your review here...", color = Color.Gray, fontSize = 14.sp)
@@ -216,6 +225,9 @@ fun ReviewItem(viewModel: ReaderReviewsModel, review: Review, bookID: String, mo
     var showAllReplies by remember { mutableStateOf(false) }
     var showReplyDialog by remember { mutableStateOf(false) }
     var replyText by remember { mutableStateOf("") }
+
+    var showWarningDialog by remember { mutableStateOf(false) }
+    var detectedProhibitedWords by remember { mutableStateOf(listOf<String>()) }
 
     Column(modifier = modifier.padding(start = 20.dp, top = 10.dp)) {
         Row(
@@ -297,16 +309,47 @@ fun ReviewItem(viewModel: ReaderReviewsModel, review: Review, bookID: String, mo
                                 )
                             }
                         },
+
                         confirmButton = {
                             TextButton(
                                 onClick = {
-                                    viewModel.replyReview(bookID, review.reviewID, replyText)
-                                    print(review.replies.size)
-                                    replyText = ""
-                                    showReplyDialog = false
+                                    val detectedWords = containsProhibitedWords(replyText)
+                                    if (detectedWords.isNotEmpty()) {
+                                        detectedProhibitedWords = detectedWords
+                                        showWarningDialog = true
+                                    } else {
+                                        showWarningDialog = false
+                                        viewModel.replyReview(bookID, review.reviewID, replyText)
+                                        print(review.replies.size)
+                                        replyText = ""
+                                        showReplyDialog = false
+                                    }
+
                                 }
                             ) {
                                 Text("Submit")
+                            }
+
+                            if (showWarningDialog) {
+                                AlertDialog(
+                                    onDismissRequest = { showWarningDialog = false },
+                                    title = { Text("Warning") },
+                                    text = {
+                                        Column {
+                                            Text("Your reply contains prohibited words:")
+                                            detectedProhibitedWords.forEach { word ->
+                                                Text("- $word")
+                                            }
+                                        }
+                                    },
+                                    confirmButton = {
+                                        TextButton(
+                                            onClick = { showWarningDialog = false }
+                                        ) {
+                                            Text("OK")
+                                        }
+                                    }
+                                )
                             }
                         },
                         dismissButton = {
@@ -383,11 +426,6 @@ fun SubmitReviewButton(
 ) {
     var showWarningDialog by remember { mutableStateOf(false) }
     var detectedProhibitedWords by remember { mutableStateOf(listOf<String>()) }
-
-    fun containsProhibitedWords(text: String): List<String> {
-        val words = text.split(" ", ".", ",", "!", "?", ":", ";", "-", "_")
-        return words.filter { it.lowercase() in prohibitedWords }
-    }
 
     TextButton(
         onClick = {
