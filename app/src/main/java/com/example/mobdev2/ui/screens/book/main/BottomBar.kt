@@ -7,6 +7,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Chair
 import androidx.compose.material.icons.filled.Forum
 import androidx.compose.material.icons.filled.LibraryBooks
+import androidx.compose.material.icons.filled.ManageSearch
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Icon
@@ -59,6 +60,6 @@ enum class BottomBarDestination(
 ) {
     AllBook(AllBookScreenDestination, Icons.Default.Home, R.string.book_all_screen),
     BookLibrary(LibraryScreenDestination, Icons.Default.LibraryBooks, R.string.book_library),
-    AdvancedSearch(AdvancedSearchScreenDestination, Icons.Default.Forum, R.string.advanced_search),
+    AdvancedSearch(AdvancedSearchScreenDestination, Icons.Default.ManageSearch, R.string.advanced_search),
     Settings(SettingsScreenDestination, Icons.Default.Settings, R.string.book_settings_screen)
 }

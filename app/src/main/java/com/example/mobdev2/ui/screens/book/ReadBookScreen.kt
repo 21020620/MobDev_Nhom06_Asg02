@@ -175,6 +175,12 @@ fun ReadBookScreen(
 
     var showSearch by remember { mutableStateOf(false) }
 
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.toggleAudio(lazyListState.firstVisibleItemIndex + 1)
+        }
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         gesturesEnabled = drawerState.isOpen,

@@ -248,7 +248,6 @@ class ReadBookViewModel(
         val mutableList = MutableList(chapterSize.value) { AnnotatedString("") }
         for (i in 0 until chapterSize.value) {
             mutableList[i] = buildAnnotatedString {
-                Log.d("Content", chaptersContent[i])
                 append(chaptersContent[i])
                 for (j in highlights.value[i].indices) {
                     if (j % 2 == 0) {

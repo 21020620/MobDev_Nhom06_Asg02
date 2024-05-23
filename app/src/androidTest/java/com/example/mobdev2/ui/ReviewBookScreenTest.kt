@@ -77,14 +77,6 @@ class ReviewBookScreenTest {
         composeRule.onNodeWithTag("ReviewTextField").performTextInput(reviewText)
 
         composeRule.onNodeWithText("Submit").performClick()
-
-
-//        composeRule.waitUntil(timeoutMillis) {
-//            val reviewNodes = composeRule.onAllNodesWithText(reviewText).fetchSemanticsNodes()
-//            println("Found ${reviewNodes.size} nodes with review text")
-//            reviewNodes.isNotEmpty()
-//        }
-//        composeRule.onNodeWithText(reviewText).assertIsDisplayed()
     }
 
 

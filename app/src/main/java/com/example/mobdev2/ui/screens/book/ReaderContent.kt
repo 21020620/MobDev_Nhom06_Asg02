@@ -92,7 +92,6 @@ fun ReaderContent(
                 key = { index -> viewModel.state.book!!.chapters[index].name }
             ) { index ->
                 val chapter = viewModel.state.book!!.chapters[index]
-                Log.d("Content here", chaptersContent.value[index].toString())
                 ChapterLazyItem(
                     chapterName = chapter.name,
                     chapterContent = viewModel.highlightSearchResults(chaptersContent.value[index], index),
